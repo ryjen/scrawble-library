@@ -1,6 +1,12 @@
 
 set(LIBRARY_FILES
 	scrawble.cpp
+	player.cpp
+	config.cpp
+	vt100.cpp
+	board.cpp
+	bag.cpp
+	lexicon/gaddag.cpp
 )
 
 

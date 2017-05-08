@@ -29,7 +29,8 @@ class move
     std::vector<data> placed_;
 
    public:
-    move(const point &start, const std::string &word) : start_(start), word_(word), score_(0)
+    move(const point &start, const std::string &word)
+        : start_(start), word_(word), score_(0)
     {
     }
 

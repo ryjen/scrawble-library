@@ -1,40 +1,21 @@
 #ifndef SCRAWBLE_BAG_H
 #define SCRAWBLE_BAG_H
 
+#include <scrawble/config.h>
+#include <scrawble/tile.h>
 #include <random>
 
 class bag
 {
    public:
-    bag &push(char ch)
-    {
-        letters_.push_back(ch);
-        return *this;
-    }
+    bag(const config &conf);
 
-    bag &fill(const std::vector<char> &rack, int number = 7)
-    {
-        while (rack.size() < number) {
-            rack.push_back(next());
-        }
-        return *this;
-    }
+    bag &push(const tile &tile);
 
-    char next()
-    {
-        if (letters_.empty()) {
-            throw - 1;
-        }
-        std::uniform_int_distribution<> dis(0, letters_.size());
-        int index = dis(rand_);
-        auto it = letters_.begin() + index;
-        char value = *it;
-        letters_.erase(it);
-        return value;
-    }
+    tile next();
 
    private:
-    std::vector<char> letters_;
+    std::vector<tile> letters_;
     std::default_random_engine rand_;
 };
 

@@ -83,5 +83,4 @@ class node
     list_type children_;
 };
 
-
 #endif

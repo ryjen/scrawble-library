@@ -1,0 +1,8 @@
+    ←: move selector left
+    ↑: move selector up
+    →: move selector right
+    ↓: move selector down
+    s: select tile
+    p: place tile
+    e: end turn
+    S: shuffle letters

@@ -12,6 +12,9 @@ project (scrawble VERSION 0.1.0)
 # set path to custom modules
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
+
 include(ValgrindTest)
 
 find_program(HEADERDOC headerdoc2html)

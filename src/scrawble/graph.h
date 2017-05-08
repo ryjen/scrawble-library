@@ -86,9 +86,9 @@ class graph
    private:
     typedef std::map<V, list_type> container_type;
 
-
    public:
-    graph(const graphs::flags::type &flags = graphs::flags::none) : flags_(flags)
+    graph(const graphs::flags::type &flags = graphs::flags::none)
+        : flags_(flags)
     {
     }
 
@@ -168,7 +168,8 @@ class graph
         return list->second;
     }
 
-    int degree(const V &v, const graphs::degree::type &type = graphs::degree::both) const
+    int degree(const V &v,
+               const graphs::degree::type &type = graphs::degree::both) const
     {
         switch (type) {
             case graphs::degree::out: {
@@ -192,7 +193,8 @@ class graph
                 return count;
             }
             case graphs::degree::both:
-                return degree(v, graphs::degree::out) + degree(v, graphs::degree::in);
+                return degree(v, graphs::degree::out) +
+                       degree(v, graphs::degree::in);
         }
     }
 

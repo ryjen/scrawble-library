@@ -3,7 +3,9 @@
 
 int main(int argc, char *argv[])
 {
-    scrawble scrawble;
+    config config;
+
+    scrawble scrawble(config);
 
     std::cout << scrawble << std::endl;
 
