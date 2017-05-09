@@ -43,51 +43,13 @@ void board::init()
     loader(letterBonus_, doubleCh.begin(), doubleCh.end(), 2);
 }
 
-void board::print(std::ostream& out) const
+
+char board::value(int x, int y)
 {
-    for (int i = 0; i < size; i++) {
-        if (i == 0) {
-            out << "╭───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───╮\n";
-        } else {
-            out << "├───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┤\n";
-        }
-        for (int j = 0; j < size; j++) {
-            out << "│ ";
-            if (values_[i][j] == '_') {
-                switch (wordBonus_[i][j]) {
-                    case 2:
-                        print_bonus_square(out, 2, vt100::MAGENTA);
-                        break;
-                    case 3:
-                        print_bonus_square(out, 3, vt100::RED);
-                        break;
-                    default:
-                        switch (letterBonus_[i][j]) {
-                            case 2:
-                                print_bonus_square(out, 2, vt100::CYAN);
-                                break;
-                            case 3:
-                                print_bonus_square(out, 3, vt100::YELLOW);
-                                break;
-                            default:
-                                out << " ";
-                                break;
-                        }
-                }
-            } else {
-                out << vt100::color(vt100::WHITE, vt100::BRIGHT) << values_[i][j] << vt100::reset();
-            }
-            out << " ";
-        }
-        out << "│\n";
-    }
-    out << "╰───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───╯\n";
+    return values_[x][y];
 }
 
-void board::print_bonus_square(std::ostream& out, int bonus, int color) const
+short board::bonus(int x, int y, bool word)
 {
-    out << vt100::color(vt100::BLACK, vt100::BRIGHT, color);
-
-    out << bonus << vt100::reset();
+    return word ? wordBonus_[x][y] : letterBonus_[x][y];
 }
-

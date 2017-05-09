@@ -6,7 +6,8 @@
 #include <iterator>
 #include <vector>
 
-class board {
+class board
+{
    public:
     const static int size = 15;
 
@@ -14,11 +15,10 @@ class board {
 
     void init();
 
-    void print(std::ostream& out) const;
+    char value(int x, int y);
+    short bonus(int x, int y, bool word = false);
 
    private:
-    void print_bonus_square(std::ostream& out, int bonus, int color) const;
-
     char values_[size][size];
     short wordBonus_[size][size];
     short letterBonus_[size][size];

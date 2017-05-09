@@ -25,6 +25,8 @@ find_program(DOXYGEN doxygen)
 include(CreatePackage)
 create_package(DESCRIPTION "A command line multiplayer scrabble game")
 
+include(FindCurses)
+
 # add target for code coverage
 if(ENABLE_COVERAGE)
 	include(CodeCoverage)

@@ -1,6 +1,6 @@
 #include <scrawble/bag.h>
 
-bag::bag(const config &conf)
+void bag::init(const config &conf)
 {
     for (auto tile : conf.letters()) {
         for (int i = 0; i < tile.count; i++) {
@@ -20,8 +20,11 @@ tile bag::next()
     if (letters_.empty()) {
         throw - 1;
     }
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, letters_.size());
-    int index = dis(rand_);
+    int index = dis(gen);
     auto it = letters_.begin() + index;
     auto value = *it;
     letters_.erase(it);

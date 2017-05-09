@@ -6,6 +6,7 @@ set(LIBRARY_FILES
 	vt100.cpp
 	board.cpp
 	bag.cpp
+	io.cpp
 	lexicon/gaddag.cpp
 )
 
@@ -18,7 +19,7 @@ set(SOURCE_FILES
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
-target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_algo)
+target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_algo ${CURSES_LIBRARIES})
 
 set(HEADER_FILES
 	scrawble.h

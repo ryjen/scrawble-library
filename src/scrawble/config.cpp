@@ -2,6 +2,15 @@
 
 using json = nlohmann::json;
 
+config::config()
+{
+}
+
+config::config(const std::string &filePath)
+{
+    load(filePath);
+}
+
 void config::load(const std::string &filepath)
 {
     file_reader input(filepath);
@@ -23,6 +32,20 @@ void config::load(const std::string &filepath)
     }
 }
 
+const std::vector<config::tile> &config::letters() const
+{
+    return letters_;
+}
+
+const std::string &config::dictionary() const
+{
+    return dictionary_;
+}
+
+void config::load()
+{
+    load(DEFAULT_CONFIG_FILE);
+}
 file_reader::file_reader(const std::string &filePath) : input_(filePath)
 {
     assert(input_.is_open());
@@ -54,12 +77,9 @@ json file_reader::to_json()
     return j;
 }
 
-namespace detail
+std::istream &operator>>(std::istream &is, file_reader::line &line)
 {
-    std::istream &operator>>(std::istream &is, std::string &line)
-    {
-        return std::getline(is, line);
-    }
+    return std::getline(is, line);
 }
 
 file_reader::iterator file_reader::begin()

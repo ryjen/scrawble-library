@@ -11,15 +11,9 @@ class config
    public:
     static constexpr const char *DEFAULT_CONFIG_FILE = "assets/english.json";
 
-    config()
-    {
-        load(DEFAULT_CONFIG_FILE);
-    }
+    config();
 
-    config(const std::string &filePath)
-    {
-        load(filePath);
-    }
+    config(const std::string &filePath);
 
     typedef struct tile {
         int score;
@@ -30,17 +24,13 @@ class config
         }
     } tile;
 
-    const std::vector<tile> &letters() const
-    {
-        return letters_;
-    }
+    const std::vector<tile> &letters() const;
 
-    const std::string &dictionary() const
-    {
-        return dictionary_;
-    }
+    const std::string &dictionary() const;
 
     void load(const std::string &filepath);
+
+    void load();
 
    private:
     std::vector<tile> letters_;
@@ -50,8 +40,13 @@ class config
 class file_reader
 {
    public:
-    typedef std::istream_iterator<std::string> iterator;
-    typedef const std::istream_iterator<std::string> const_iterator;
+    class line : public std::string
+    {
+       public:
+        friend std::istream &operator>>(std::istream &is, line &line);
+    };
+
+    typedef std::istream_iterator<line> iterator;
 
     file_reader(const std::string &filePath);
     virtual ~file_reader();

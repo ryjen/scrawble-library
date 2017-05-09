@@ -10,11 +10,13 @@ class player
    public:
     static const int rack_size = 7;
 
-    void print(std::ostream& out);
-
     player& push(const tile& tile);
 
     player& pop(const tile& tile);
+
+    player& shuffle();
+
+    const std::vector<tile>& rack() const;
 
    private:
     std::vector<tile> rack_;

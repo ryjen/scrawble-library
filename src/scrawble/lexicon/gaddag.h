@@ -1,8 +1,8 @@
 #ifndef SCRAWBLE_LEXICON_GADDAG_H
 #define SCRAWBLE_LEXICON_GADDAG_H
 
+#include <scrawble/lexicon/trie.h>
 #include <string>
-#include "trie.h"
 
 class gaddag : public trie
 {

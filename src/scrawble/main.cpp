@@ -1,13 +1,17 @@
 #include <scrawble/scrawble.h>
-#include <cstdlib>
+#include <cstdio>
 
 int main(int argc, char *argv[])
 {
-    config config;
+    scrawble game;
 
-    scrawble scrawble(config);
+    game.load();
 
-    std::cout << scrawble << std::endl;
+    do {
+        game.render();
+
+        game.update();
+    } while (!game.is_over());
 
     return EXIT_SUCCESS;
 }

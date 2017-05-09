@@ -1,4 +1,4 @@
-#include "gaddag.h"
+#include <scrawble/lexicon/gaddag.h>
 
 gaddag::gaddag() : trie()
 {

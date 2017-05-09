@@ -8,7 +8,7 @@
 class bag
 {
    public:
-    bag(const config &conf);
+    void init(const config &conf);
 
     bag &push(const tile &tile);
 
@@ -16,7 +16,6 @@ class bag
 
    private:
     std::vector<tile> letters_;
-    std::default_random_engine rand_;
 };
 
 #endif

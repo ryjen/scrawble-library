@@ -4,13 +4,12 @@
 #include <cassert>
 #include <fstream>
 
-std::ostream& operator<<(std::ostream& out, const scrawble& scrawble)
+void scrawble::load(const std::string& filePath)
 {
-    scrawble.print(out);
-    return out;
+    load(config(filePath));
 }
 
-scrawble::scrawble(const config& conf) : bag_(conf)
+void scrawble::load(const config& conf)
 {
     std::ifstream in(conf.dictionary());
 
@@ -20,35 +19,58 @@ scrawble::scrawble(const config& conf) : bag_(conf)
         dictionary_.push(line);
     }
 
-    auto plr = std::make_shared<player>();
+    bag_.init(conf);
 
-    players_[this_player] = plr;
+    player plr;
+
+    players_[this_player_index] = plr;
 
     for (int i = 0; i < player::rack_size; i++) {
-        plr->push(bag_.next());
+        plr.push(bag_.next());
     }
 }
-
-void scrawble::print(std::ostream& out) const
+scrawble::scrawble() : turn_(0), players_(max_players), state_(Running)
 {
-    board_.print(out);
-
-    players_[this_player]->print(out);
-
-    file_reader reader("assets/help.txt");
-
-    out << vt100::cursor::save();
-
-    int row = 2;
-    for (auto line : reader) {
-        out << vt100::cursor::set(row++, 80);
-        out << line;
-    }
-
-    out << vt100::cursor::restore();
 }
 
-void scrawble::search(int x, int y, const std::vector<char>& rack, const std::set<move>& pool) const
+void scrawble::update()
+{
+    term_.update(*this);
+}
+
+void scrawble::render()
+{
+    term_.render(*this);
+}
+
+player& scrawble::get_player()
+{
+    return players_[this_player_index];
+}
+
+board& scrawble::get_board()
+{
+    return board_;
+}
+
+void scrawble::finish_turn()
+{
+    if (++turn_ > players_.size()) {
+        turn_ = 0;
+    }
+}
+
+void scrawble::quit()
+{
+    state_ = Stopped;
+}
+
+bool scrawble::is_over() const
+{
+    return state_ == Stopped;
+}
+
+void scrawble::search(int x, int y, const std::vector<tile>& rack, const std::set<lexicon::move>& pool) const
 {
     node root;
 }
