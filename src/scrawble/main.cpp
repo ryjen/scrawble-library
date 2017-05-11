@@ -1,17 +1,20 @@
+#include <scrawble/game.h>
 #include <scrawble/scrawble.h>
 #include <cstdio>
 
 int main(int argc, char *argv[])
 {
-    scrawble game;
+    scrawble::config config;
 
-    game.load();
+    config.load();
+
+    scrawble::game handler(config);
 
     do {
-        game.render();
+        handler.render();
 
-        game.update();
-    } while (!game.is_over());
+        handler.update();
+    } while (!handler.is_over());
 
     return EXIT_SUCCESS;
 }

@@ -1,21 +1,21 @@
 #ifndef SCRAWBLE_BAG_H
 #define SCRAWBLE_BAG_H
 
-#include <scrawble/config.h>
 #include <scrawble/tile.h>
 #include <random>
 
-class bag
+namespace scrawble
 {
-   public:
-    void init(const config &conf);
+    class bag
+    {
+       public:
+        bag &push(const tile &tile);
 
-    bag &push(const tile &tile);
+        tile next();
 
-    tile next();
-
-   private:
-    std::vector<tile> letters_;
-};
+       private:
+        std::vector<tile> letters_;
+    };
+}
 
 #endif

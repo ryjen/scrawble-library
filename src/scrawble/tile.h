@@ -3,35 +3,38 @@
 
 #include <string>
 
-class tile
+namespace scrawble
 {
-   public:
-    tile(const std::string &letter, int score) : score_(score), letter_(letter)
+    class tile
     {
-    }
+       public:
+        tile(const std::string &letter, int score) : score_(score), letter_(letter)
+        {
+        }
 
-    int score() const
-    {
-        return score_;
-    }
+        int score() const
+        {
+            return score_;
+        }
 
-    std::string letter() const
-    {
-        return letter_;
-    }
+        std::string letter() const
+        {
+            return letter_;
+        }
 
-    bool operator<(const tile &other) const
-    {
-        return letter_ < other.letter_;
-    }
-    bool operator==(const tile &other) const
-    {
-        return letter_ == other.letter_;
-    }
+        bool operator<(const tile &other) const
+        {
+            return letter_ < other.letter_;
+        }
+        bool operator==(const tile &other) const
+        {
+            return letter_ == other.letter_;
+        }
 
-   private:
-    int score_;
-    std::string letter_;
-};
+       private:
+        int score_;
+        std::string letter_;
+    };
+}
 
 #endif

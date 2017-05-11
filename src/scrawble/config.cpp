@@ -1,92 +1,95 @@
 #include <scrawble/config.h>
 
-using json = nlohmann::json;
-
-config::config()
+namespace scrawble
 {
-}
+    using json = nlohmann::json;
 
-config::config(const std::string &filePath)
-{
-    load(filePath);
-}
+    config::config()
+    {
+    }
 
-void config::load(const std::string &filepath)
-{
-    file_reader input(filepath);
+    config::config(const std::string &filePath)
+    {
+        load(filePath);
+    }
 
-    json j = input.to_json();
+    void config::load(const std::string &filepath)
+    {
+        file_reader input(filepath);
 
-    dictionary_ = j["dictionary"];
+        json j = input.to_json();
 
-    auto tiles = j["tiles"];
+        dictionary_ = j["dictionary"];
 
-    for (auto tile : tiles) {
-        int score = tile["score"];
+        auto tiles = j["tiles"];
 
-        auto distributions = tile["letter_distributions"];
+        for (auto tile : tiles) {
+            int score = tile["score"];
 
-        for (auto it = distributions.begin(); it != distributions.end(); ++it) {
-            letters_.emplace_back(score, it.value(), it.key());
+            auto distributions = tile["letter_distributions"];
+
+            for (auto it = distributions.begin(); it != distributions.end(); ++it) {
+                letters_.emplace_back(score, it.value(), it.key());
+            }
         }
     }
-}
 
-const std::vector<config::tile> &config::letters() const
-{
-    return letters_;
-}
+    const std::vector<config::tile> &config::letters() const
+    {
+        return letters_;
+    }
 
-const std::string &config::dictionary() const
-{
-    return dictionary_;
-}
+    const std::string &config::dictionary() const
+    {
+        return dictionary_;
+    }
 
-void config::load()
-{
-    load(DEFAULT_CONFIG_FILE);
-}
-file_reader::file_reader(const std::string &filePath) : input_(filePath)
-{
-    assert(input_.is_open());
-}
+    void config::load()
+    {
+        load(DEFAULT_CONFIG_FILE);
+    }
+    file_reader::file_reader(const std::string &filePath) : input_(filePath)
+    {
+        assert(input_.is_open());
+    }
 
-file_reader::~file_reader()
-{
-    input_.close();
-}
+    file_reader::~file_reader()
+    {
+        input_.close();
+    }
 
-json file_reader::to_json()
-{
-    json j;
-    // save current state
-    auto state = input_.rdstate();
-    auto pos = input_.tellg();
+    json file_reader::to_json()
+    {
+        json j;
+        // save current state
+        auto state = input_.rdstate();
+        auto pos = input_.tellg();
 
-    // reset
-    input_.clear();
-    input_.seekg(0);
+        // reset
+        input_.clear();
+        input_.seekg(0);
 
-    // convert
-    input_ >> j;
+        // convert
+        input_ >> j;
 
-    // restore current state
-    input_.clear(state);
-    input_.seekg(pos);
+        // restore current state
+        input_.clear(state);
+        input_.seekg(pos);
 
-    return j;
-}
+        return j;
+    }
 
-std::istream &operator>>(std::istream &is, file_reader::line &line)
-{
-    return std::getline(is, line);
-}
+    std::istream &operator>>(std::istream &is, file_reader::line &line)
+    {
+        return std::getline(is, line);
+    }
 
-file_reader::iterator file_reader::begin()
-{
-    return iterator(input_);
-}
-file_reader::iterator file_reader::end()
-{
-    return iterator();
+    file_reader::iterator file_reader::begin()
+    {
+        return iterator(input_);
+    }
+    file_reader::iterator file_reader::end()
+    {
+        return iterator();
+    }
 }
