@@ -37,7 +37,6 @@ namespace scrawble
         return *this;
     }
 
-
     const std::vector<tile>& player::rack() const
     {
         return rack_;

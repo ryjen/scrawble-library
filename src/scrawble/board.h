@@ -20,6 +20,19 @@ namespace scrawble
         char value(int x, int y);
         short bonus(int x, int y, bool word = false);
 
+        class row
+        {
+           public:
+            row(char value[size]);
+
+            char operator[](int index) const;
+
+           private:
+            char values_[size];
+        };
+
+        row &operator[](int index) const;
+
        private:
         char values_[size][size];
         short wordBonus_[size][size];

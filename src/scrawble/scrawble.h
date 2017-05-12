@@ -12,10 +12,16 @@
 
 namespace scrawble
 {
-    namespace algorithm
+    class scrawble
     {
+       public:
         void search(int x, int y, const std::vector<tile> &rack, const std::set<lexicon::move> &pool);
-    }
+
+       private:
+        bag bag_;
+        board board_;
+        gaddag dictionary_;
+    };
 }
 
 #endif

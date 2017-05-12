@@ -8,6 +8,9 @@ namespace scrawble
     class tile
     {
        public:
+        static const char EMPTY = '_';
+        static const char DIRSYM = '>';
+
         tile(const std::string &letter, int score) : score_(score), letter_(letter)
         {
         }

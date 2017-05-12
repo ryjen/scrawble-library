@@ -6,17 +6,24 @@
 
 namespace lexicon
 {
+    typedef struct __point {
+        int x;
+        int y;
+        __point(int x, int y) : x(x), y(y)
+        {
+        }
+        __point() : x(0), y(0)
+        {
+        }
+    } point;
+
+    namespace direction
+    {
+        typedef enum { left, right, up, down } type;
+    }
+
     class move
     {
-       private:
-        typedef struct __point {
-            int x;
-            int y;
-            __point(int x, int y) : x(x), y(y)
-            {
-            }
-        } point;
-
         typedef struct __data {
             char c;
             point p;

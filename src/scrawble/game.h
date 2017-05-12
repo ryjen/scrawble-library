@@ -9,7 +9,7 @@
 
 namespace scrawble
 {
-    class game
+    class game : public scrawble
     {
        public:
         static const int max_players = 4;
@@ -84,9 +84,6 @@ namespace scrawble
 
         typedef enum { Running, Stopped } state_type;
 
-        gaddag dictionary_;
-        bag bag_;
-        board board_;
         terminal_io term_;
         std::vector<player> players_;
         int turn_;
