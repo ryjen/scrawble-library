@@ -4,17 +4,21 @@
 #include <scrawble/lexicon/trie.h>
 #include <string>
 
-class gaddag : public trie
+namespace lexicon
 {
-   private:
-    node::ptr reverse_;
+    class gaddag : public trie
+    {
+       private:
+        node::ptr reverse_;
 
-   public:
-    gaddag();
-    void push(const std::string &word);
+       public:
+        gaddag();
+        void push(const std::string &word);
+        node::ptr reverse() const;
 
-   private:
-    void push_prefix(const std::string &prefix);
-};
+       private:
+        void push_prefix(const std::string &prefix);
+    };
+}
 
 #endif
