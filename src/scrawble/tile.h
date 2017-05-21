@@ -8,7 +8,7 @@ namespace scrawble
     class tile
     {
        public:
-        tile(const std::string &letter, int score) : score_(score), letter_(letter)
+        tile(const char &letter, int score) : score_(score), letter_(letter)
         {
         }
 
@@ -17,7 +17,7 @@ namespace scrawble
             return score_;
         }
 
-        std::string letter() const
+        char letter() const
         {
             return letter_;
         }
@@ -33,7 +33,7 @@ namespace scrawble
 
        private:
         int score_;
-        std::string letter_;
+        char letter_;
     };
 }
 

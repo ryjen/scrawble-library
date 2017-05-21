@@ -29,7 +29,7 @@ namespace scrawble
             auto distributions = tile["letter_distributions"];
 
             for (auto it = distributions.begin(); it != distributions.end(); ++it) {
-                letters_.emplace_back(score, it.value(), it.key());
+                letters_.emplace_back(score, it.value(), it.key()[0]);
             }
         }
     }

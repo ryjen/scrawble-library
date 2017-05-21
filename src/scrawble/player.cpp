@@ -1,5 +1,6 @@
 #include "player.h"
 #include <scrawble/vt100.h>
+#include <algorithm>
 #include <iostream>
 #include <random>
 

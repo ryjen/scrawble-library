@@ -6,6 +6,8 @@ int main(int argc, char *argv[])
 {
     scrawble::config config;
 
+    std::cout << "Loading config, please wait...\n";
+
     config.load();
 
     scrawble::game handler(config);
