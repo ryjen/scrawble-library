@@ -9,10 +9,22 @@
 #include <cstdlib>
 
 #define HIGHLIGHT 8
+#define KB_DOWN 0x42
+#define KB_LEFT 0x44
+#define KB_RIGHT 0x43
+#define KB_UP 0x41
+
+#define PLAYER_RACK_ROW 32
+#define MIN_PLAYER_RACK_COLUMN 18
+#define MAX_PLAYER_RACK_COLUMN 39
+#define MIN_BOARD_COLUMN 2
+#define MAX_BOARD_COLUMN 58
+#define MIN_BOARD_ROW 1
+#define MAX_BOARD_ROW 29
 
 namespace scrawble
 {
-    terminal_io::terminal_io() : pos_(19, 31), flags_(FLAG_DIRTY)
+    terminal_io::terminal_io() : pos_(MIN_PLAYER_RACK_COLUMN, PLAYER_RACK_ROW), flags_(FLAG_DIRTY)
     {
         timeout(-1);
         setlocale(LC_CTYPE, "");
@@ -38,25 +50,38 @@ namespace scrawble
 
     void terminal_io::update(game &game)
     {
-        switch (getch()) {
+        int ch = getch();
+
+        if (ch == 0x1B) {
+            ch = getch();
+            if (ch == 0x5B) {
+                ch = getch();
+            }
+        }
+
+        switch (ch) {
             case 'f':
                 game.finish_turn();
                 flags_ |= FLAG_DIRTY;
                 break;
             case KEY_UP:
-                pos_.y--;
+            case KB_UP:
+                pos_.y = std::max(MIN_BOARD_ROW, pos_.y - (pos_.y == PLAYER_RACK_ROW ? 3 : 2));
                 flags_ |= FLAG_DIRTY;
                 break;
             case KEY_DOWN:
-                pos_.y++;
+            case KB_DOWN:
+                pos_.y = std::min(PLAYER_RACK_ROW, pos_.y + (pos_.y == MAX_BOARD_ROW ? 3 : 2));
                 flags_ |= FLAG_DIRTY;
                 break;
             case KEY_LEFT:
-                pos_.x--;
+            case KB_LEFT:
+                pos_.x = std::max(MIN_BOARD_COLUMN, pos_.x - 4);
                 flags_ |= FLAG_DIRTY;
                 break;
             case KEY_RIGHT:
-                pos_.x++;
+            case KB_RIGHT:
+                pos_.x = std::min(MAX_BOARD_COLUMN, pos_.x + 4);
                 flags_ |= FLAG_DIRTY;
                 break;
             case 's':
@@ -95,15 +120,14 @@ namespace scrawble
 
         int row = 2;
         for (auto line : reader) {
-            move(row++, 66);
-            printw("%s", line.c_str());
+            mvprintw(row++, 66, "%s", line.c_str());
         }
     }
 
     void terminal_io::render_select()
     {
-        move(pos_.x, pos_.y);
-        chgat(1, A_BOLD, COLOR_PAIR(HIGHLIGHT), NULL);
+        move(pos_.y, pos_.x);
+        chgat(1, 0, COLOR_PAIR(HIGHLIGHT), NULL);
     }
 
     void terminal_io::render(player &player)
