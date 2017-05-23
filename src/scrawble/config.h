@@ -20,13 +20,13 @@ namespace scrawble
             }
         } tile;
 
-        const std::vector<tile> &letters() const;
+        const std::vector<tile> &tile_distributions() const;
 
-        const std::string &dictionary() const;
+        const std::string &dictionary_file_name() const;
 
-        virtual void load(const std::string &filepath) = 0;
+        virtual void load(const std::string &filename) = 0;
 
-       private:
+       protected:
         std::vector<tile> letters_;
         std::string dictionary_;
     };

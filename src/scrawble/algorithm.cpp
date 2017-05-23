@@ -1,14 +1,28 @@
-#include <scrawble/game.h>
-#include <scrawble/lexicon/node.h>
-#include <algorithm>
-#include <cassert>
-#include <fstream>
-#include <string>
+#include <scrawble/algorithm.h>
 
 namespace scrawble
 {
     namespace temp
     {
+        struct move {
+            lexicon::point start;
+            lexicon::point left;
+            lexicon::point actual;
+            lexicon::direction::type direction;
+            std::string word;
+            lexicon::node::ptr node;
+            std::vector<tile> rack;
+
+            move(const lexicon::point start, const lexicon::point &actual, lexicon::direction::type dir,
+                 const std::string &word, const lexicon::node::ptr &node, const std::vector<tile> &rack);
+
+            move copy(char del) const;
+
+            move turn(lexicon::direction::type dir) const;
+
+            lexicon::move convert() const;
+        };
+
         move::move(const lexicon::point start, const lexicon::point &actual, lexicon::direction::type dir,
                    const std::string &word, const lexicon::node::ptr &node, const std::vector<tile> &rack)
             : start(start), left(), actual(actual), direction(dir), word(word), node(node), rack(rack)
@@ -57,12 +71,12 @@ namespace scrawble
         }
     }
 
-    game::game()
+    algorithm::algorithm()
     {
-        board_.initialize();
+        board_.init();
     }
 
-    void game::search(int x, int y, const std::vector<tile> &rack, std::set<lexicon::move> &pool)
+    void algorithm::search(int x, int y, const std::vector<tile> &rack, std::set<lexicon::move> &pool)
     {
         lexicon::node::ptr root;
 
@@ -89,8 +103,8 @@ namespace scrawble
         }
     }
 
-    void game::recurse_left_right(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
-                                  const std::vector<tile> &rack)
+    void algorithm::recurse_left_right(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
+                                       const std::vector<tile> &rack)
     {
         if (x < 0 || x >= board::size || y < 0 || y >= board::size) {
             return;
@@ -115,8 +129,8 @@ namespace scrawble
         }
     }
 
-    void game::recurse_up_down(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
-                               const std::vector<tile> &rack)
+    void algorithm::recurse_up_down(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
+                                    const std::vector<tile> &rack)
     {
         if (x < 0 || x >= board::size || y < 0 || y >= board::size) {
             return;
@@ -140,7 +154,7 @@ namespace scrawble
         }
     }
 
-    void game::search_recursive(std::set<lexicon::move> &pool, const temp::move &m)
+    void algorithm::search_recursive(std::set<lexicon::move> &pool, const temp::move &m)
     {
         if (!cross(m, m.node->value())) {
             return;
@@ -177,7 +191,7 @@ namespace scrawble
         }
     }
 
-    bool game::end_of_board(const temp::move &m) const
+    bool algorithm::end_of_board(const temp::move &m) const
     {
         switch (m.direction) {
             case lexicon::direction::left:
@@ -191,7 +205,7 @@ namespace scrawble
         }
     }
 
-    char game::next_tile(const temp::move &m) const
+    char algorithm::next_tile(const temp::move &m) const
     {
         switch (m.direction) {
             case lexicon::direction::left:
@@ -205,7 +219,7 @@ namespace scrawble
         }
     }
 
-    bool game::cross(const temp::move &m, char ch) const
+    bool algorithm::cross(const temp::move &m, char ch) const
     {
         int x = m.actual.x;
         int y = m.actual.y;
@@ -236,7 +250,7 @@ namespace scrawble
         }
     }
 
-    bool game::contains(int x1, int y1, bool down, int x2, int y2, char ch) const
+    bool algorithm::contains(int x1, int y1, bool down, int x2, int y2, char ch) const
     {
         auto it = dictionary_.begin();
 
@@ -277,22 +291,5 @@ namespace scrawble
                 return node->marker();
         }
         return node->marker();
-    }
-
-    player &game::get_player()
-    {
-        return players_[this_player_index];
-    }
-
-    board &game::get_board()
-    {
-        return board_;
-    }
-
-    void game::finish_turn()
-    {
-        if (++turn_ > players_.size()) {
-            turn_ = 0;
-        }
     }
 }

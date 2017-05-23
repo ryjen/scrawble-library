@@ -15,7 +15,7 @@ namespace scrawble
 
         board();
 
-        void initialize();
+        void init();
 
         char value(int x, int y);
 

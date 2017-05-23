@@ -6,12 +6,12 @@ namespace scrawble
     {
     }
 
-    const std::vector<config::tile> &config::letters() const
+    const std::vector<config::tile> &config::tile_distributions() const
     {
         return letters_;
     }
 
-    const std::string &config::dictionary() const
+    const std::string &config::dictionary_file_name() const
     {
         return dictionary_;
     }
