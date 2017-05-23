@@ -1,97 +1,81 @@
-#ifndef SCRAWBLE_GAME_H
-#define SCRAWBLE_GAME_H
+#ifndef SCRAWBLE_SCRAWBLE_H
+#define SCRAWBLE_SCRAWBLE_H
 
-#include <curses.h>
+#include <scrawble/bag.h>
+#include <scrawble/board.h>
 #include <scrawble/config.h>
-#include <scrawble/io.h>
+#include <scrawble/lexicon/gaddag.h>
+#include <scrawble/lexicon/move.h>
 #include <scrawble/player.h>
-#include <scrawble/scrawble.h>
 #include <scrawble/tile.h>
+#include <set>
+#include <stack>
+#include <vector>
 
 namespace scrawble
 {
-    class game : public scrawble
+    namespace temp
+    {
+        struct move {
+            lexicon::point start;
+            lexicon::point left;
+            lexicon::point actual;
+            lexicon::direction::type direction;
+            std::string word;
+            lexicon::node::ptr node;
+            std::vector<tile> rack;
+
+            move(const lexicon::point start, const lexicon::point &actual, lexicon::direction::type dir,
+                 const std::string &word, const lexicon::node::ptr &node, const std::vector<tile> &rack);
+
+            move copy(char del) const;
+
+            move turn(lexicon::direction::type dir) const;
+
+            lexicon::move convert() const;
+        };
+    }
+
+    class game
     {
        public:
-        static const int max_players = 4;
+        game();
 
-        game(const config& conf) : turn_(0), players_(max_players), state_(Running)
-        {
-            load(conf);
-        }
+        void search(int x, int y, const std::vector<tile> &rack, std::set<lexicon::move> &pool);
 
-        ~game()
-        {
-            endwin();
-        }
+        player &get_player();
 
-        void load(const config& conf)
-        {
-            file_reader reader(conf.dictionary());
+        board &get_board();
 
-            for (auto line : reader) {
-                dictionary_.push(line);
-            }
+        void finish_turn();
 
-            for (auto t : conf.letters()) {
-                for (int i = 0; i < t.count; i++) {
-                    bag_.push(tile(t.letter, t.score));
-                }
-            }
+        virtual void load(const config &conf) = 0;
 
-            player& plr = players_[this_player_index];
-
-            for (int i = 0; i < player::rack_size; i++) {
-                plr.push(bag_.next());
-            }
-        }
-
-        void update()
-        {
-            term_.update(*this);
-        }
-
-        void render()
-        {
-            term_.render(*this);
-        }
-
-        player& get_player()
-        {
-            return players_[this_player_index];
-        }
-
-        board& get_board()
-        {
-            return board_;
-        }
-
-        void finish_turn()
-        {
-            if (++turn_ > players_.size()) {
-                turn_ = 0;
-            }
-        }
-
-        void quit()
-        {
-            state_ = Stopped;
-        }
-
-        bool is_over() const
-        {
-            return state_ == Stopped;
-        }
+       protected:
+        bag bag_;
+        board board_;
+        lexicon::gaddag dictionary_;
+        std::vector<player> players_;
+        int turn_;
 
        private:
         static const int this_player_index = 0;
 
-        typedef enum { Running, Stopped } state_type;
+        bool end_of_board(const temp::move &m) const;
 
-        terminal_io term_;
-        std::vector<player> players_;
-        int turn_;
-        state_type state_;
+        char next_tile(const temp::move &m) const;
+
+        void recurse_left_right(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
+                                const std::vector<tile> &rack);
+
+        void recurse_up_down(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
+                             const std::vector<tile> &rack);
+
+        void search_recursive(std::set<lexicon::move> &pool, const temp::move &m);
+
+        bool cross(const temp::move &m, char ch) const;
+
+        bool contains(int x, int y, bool down, int x2, int y2, char ch) const;
     };
 }
 
