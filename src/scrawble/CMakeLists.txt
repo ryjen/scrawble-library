@@ -11,7 +11,6 @@ set(LIBRARY_FILES
 add_library(${PROJECT_NAME}_algo ${LIBRARY_FILES})
 
 set(SOURCE_FILES 
-	vt100.cpp
 	player.cpp
 	config.cpp
 	io.cpp

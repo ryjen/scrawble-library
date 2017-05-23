@@ -8,22 +8,32 @@
 #include <scrawble/game.h>
 #include <cstdlib>
 
-#define KB_UP 72
-#define KB_DOWN 80
-#define KB_LEFT 75
-#define KB_RIGHT 77
-#define KB_ESCAPE 27
+#define HIGHLIGHT 8
 
 namespace scrawble
 {
-    terminal_io::terminal_io()
+    terminal_io::terminal_io() : pos_(19, 31), flags_(FLAG_DIRTY)
     {
         timeout(-1);
+        setlocale(LC_CTYPE, "");
+        initscr();
+        raw();
+        noecho();
+        start_color();
+
+        init_pair(COLOR_MAGENTA, COLOR_BLACK, COLOR_MAGENTA);
+        init_pair(COLOR_RED, COLOR_BLACK, COLOR_RED);
+        init_pair(COLOR_GREEN, COLOR_BLACK, COLOR_GREEN);
+        init_pair(COLOR_YELLOW, COLOR_BLACK, COLOR_YELLOW);
+        init_pair(COLOR_CYAN, COLOR_BLACK, COLOR_CYAN);
+        init_pair(COLOR_BLUE, COLOR_BLACK, COLOR_BLUE);
+        init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
+        init_pair(HIGHLIGHT, COLOR_BLACK, COLOR_WHITE);
     }
 
     terminal_io::~terminal_io()
     {
-        std::cout << vt100::clear();
+        clear();
     }
 
     void terminal_io::update(game &game)
@@ -31,24 +41,30 @@ namespace scrawble
         switch (getch()) {
             case 'f':
                 game.finish_turn();
+                flags_ |= FLAG_DIRTY;
                 break;
-            case KB_UP:
+            case KEY_UP:
                 pos_.y--;
+                flags_ |= FLAG_DIRTY;
                 break;
-            case KB_DOWN:
+            case KEY_DOWN:
                 pos_.y++;
+                flags_ |= FLAG_DIRTY;
                 break;
-            case KB_LEFT:
+            case KEY_LEFT:
                 pos_.x--;
+                flags_ |= FLAG_DIRTY;
                 break;
-            case KB_RIGHT:
+            case KEY_RIGHT:
                 pos_.x++;
+                flags_ |= FLAG_DIRTY;
                 break;
             case 's':
                 game.get_player().shuffle();
+                flags_ |= FLAG_DIRTY;
                 break;
             case 'q':
-            case KB_ESCAPE:
+            case 'x':
                 game.quit();
                 break;
         }
@@ -56,13 +72,21 @@ namespace scrawble
 
     void terminal_io::render(game &game)
     {
-        std::cout << vt100::cursor::set(1, 1) << vt100::clear();
+        if ((flags_ & FLAG_DIRTY) == 0) {
+            return;
+        }
+
+        flags_ &= ~(FLAG_DIRTY);
+
+        move(0, 0);
 
         render(game.get_board());
 
         render(game.get_player());
 
         render_help();
+
+        render_select();
     }
 
     void terminal_io::render_help()
@@ -71,69 +95,80 @@ namespace scrawble
 
         int row = 2;
         for (auto line : reader) {
-            std::cout << vt100::cursor::set(row++, 66);
-            std::cout << line;
+            move(row++, 66);
+            printw("%s", line.c_str());
         }
+    }
+
+    void terminal_io::render_select()
+    {
+        move(pos_.x, pos_.y);
+        chgat(1, A_BOLD, COLOR_PAIR(HIGHLIGHT), NULL);
     }
 
     void terminal_io::render(player &player)
     {
-        std::cout << "                ╭───┬───┬───┬───┬───┬───┬───╮\n";
-        std::cout << "                ";
+        printw("                ╭───┬───┬───┬───┬───┬───┬───╮\n");
+        printw("                ");
 
         for (auto tile : player.rack()) {
-            std::cout << "│ " << vt100::color(vt100::WHITE, vt100::BRIGHT) << tile.letter() << vt100::reset() << " ";
+            printw("│ ");
+            attron(A_BOLD | COLOR_PAIR(COLOR_WHITE));
+            printw("%c ", tile.letter());
+            attroff(A_BOLD | COLOR_PAIR(COLOR_WHITE));
         }
-        std::cout << "│\n";
+        printw("│\n");
 
-        std::cout << "                ╰───┴───┴───┴───┴───┴───┴───╯\n";
+        printw("                ╰───┴───┴───┴───┴───┴───┴───╯\n");
     }
 
     void terminal_io::render(board &board)
     {
         for (int i = 0; i < board::size; i++) {
             if (i == 0) {
-                std::cout << "╭───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───╮\n";
+                printw("╭───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───╮\n");
             } else {
-                std::cout << "├───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┤\n";
+                printw("├───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┤\n");
             }
             for (int j = 0; j < board::size; j++) {
-                std::cout << "│ ";
-                if (board.value(i, j) == '_') {
+                printw("│ ");
+                if (board.value(i, j) == lexicon::node::EMPTY) {
                     switch (board.bonus(i, j, true)) {
                         case 2:
-                            render_bonus_square(2, vt100::MAGENTA);
+                            render_bonus_square(2, COLOR_MAGENTA);
                             break;
                         case 3:
-                            render_bonus_square(3, vt100::RED);
+                            render_bonus_square(3, COLOR_RED);
                             break;
                         default:
                             switch (board.bonus(i, j, false)) {
                                 case 2:
-                                    render_bonus_square(2, vt100::CYAN);
+                                    render_bonus_square(2, COLOR_CYAN);
                                     break;
                                 case 3:
-                                    render_bonus_square(3, vt100::YELLOW);
+                                    render_bonus_square(3, COLOR_YELLOW);
                                     break;
                                 default:
-                                    std::cout << " ";
+                                    printw(" ");
                                     break;
                             }
                     }
                 } else {
-                    std::cout << vt100::color(vt100::WHITE, vt100::BRIGHT) << board.value(i, j) << vt100::reset();
+                    attron(A_BOLD | COLOR_PAIR(COLOR_WHITE));
+                    printw("%c", board.value(i, j));
+                    attroff(A_BOLD | COLOR_PAIR(COLOR_WHITE));
                 }
-                std::cout << " ";
+                printw(" ");
             }
-            std::cout << "│\n";
+            printw("│\n");
         }
-        std::cout << "╰───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───╯\n";
+        printw("╰───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───╯\n");
     }
 
     void terminal_io::render_bonus_square(int bonus, int color) const
     {
-        std::cout << vt100::color(vt100::BLACK, vt100::RESET, color);
-
-        std::cout << bonus << vt100::reset();
+        attron(COLOR_PAIR(color));
+        printw("%d", bonus);
+        attroff(COLOR_PAIR(color));
     }
 }

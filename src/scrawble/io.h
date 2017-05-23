@@ -1,7 +1,7 @@
 #ifndef SCRAWBLE_INPUT_H
 #define SCRAWBLE_INPUT_H
 
-#include <scrawble/vt100.h>
+#include <scrawble/lexicon/move.h>
 
 namespace scrawble
 {
@@ -32,9 +32,13 @@ namespace scrawble
         void render(board &board);
         void render(player &player);
         void render_help();
+        void render_select();
         void render_bonus_square(int bonus, int color) const;
 
-        vt100::cursor::position pos_;
+        static const int FLAG_DIRTY = (1 << 0);
+
+        lexicon::point pos_;
+        int flags_;
     };
 }
 

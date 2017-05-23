@@ -15,12 +15,14 @@ namespace scrawble
        public:
         static const int max_players = 4;
 
-        game(const config& conf) : turn_(0), players_(max_players), state_(Running), flags_(FLAG_DIRTY)
+        game(const config& conf) : turn_(0), players_(max_players), state_(Running)
         {
-            initscr();
-            raw();
-            noecho();
             load(conf);
+        }
+
+        ~game()
+        {
+            endwin();
         }
 
         void load(const config& conf)
@@ -51,10 +53,7 @@ namespace scrawble
 
         void render()
         {
-            if (flags_ & FLAG_DIRTY) {
-                term_.render(*this);
-                flags_ &= ~(FLAG_DIRTY);
-            }
+            term_.render(*this);
         }
 
         player& get_player()
@@ -85,8 +84,6 @@ namespace scrawble
         }
 
        private:
-        static const int FLAG_DIRTY = (1 << 0);
-
         static const int this_player_index = 0;
 
         typedef enum { Running, Stopped } state_type;
@@ -95,7 +92,6 @@ namespace scrawble
         std::vector<player> players_;
         int turn_;
         state_type state_;
-        int flags_;
     };
 }
 
