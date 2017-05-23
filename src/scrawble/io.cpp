@@ -49,7 +49,6 @@ namespace scrawble
                 break;
             case 'q':
             case KB_ESCAPE:
-            case EOF:
                 game.quit();
                 break;
         }

@@ -29,26 +29,39 @@ namespace scrawble
             move copy(char del) const;
 
             move turn(lexicon::direction::type dir) const;
+
+            lexicon::move convert() const;
         };
     }
 
     class scrawble
     {
        public:
-        void search(int x, int y, const std::vector<tile> &rack, const std::set<lexicon::move> &pool);
+        scrawble();
 
-       private:
-        void recurse_left_right(const std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
-                                const std::vector<tile> &rack);
+        void search(int x, int y, const std::vector<tile> &rack, std::set<lexicon::move> &pool);
 
-        void recurse_up_down(const std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
-                             const std::vector<tile> &rack);
-
-        void search_recursive(const std::set<lexicon::move> &pool, const temp::move &m);
-
+       protected:
         bag bag_;
         board board_;
         lexicon::gaddag dictionary_;
+
+       private:
+        bool end_of_board(const temp::move &m) const;
+
+        char next_tile(const temp::move &m) const;
+
+        void recurse_left_right(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
+                                const std::vector<tile> &rack);
+
+        void recurse_up_down(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
+                             const std::vector<tile> &rack);
+
+        void search_recursive(std::set<lexicon::move> &pool, const temp::move &m);
+
+        bool cross(const temp::move &m, char ch) const;
+
+        bool contains(int x, int y, bool down, int x2, int y2, char ch) const;
     };
 }
 

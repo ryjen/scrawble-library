@@ -20,8 +20,8 @@ namespace scrawble
         typedef struct tile {
             int score;
             int count;
-            std::string letter;
-            tile(int score, int count, const std::string &letter) : score(score), count(count), letter(letter)
+            char letter;
+            tile(int score, int count, const char &letter) : score(score), count(count), letter(letter)
             {
             }
         } tile;

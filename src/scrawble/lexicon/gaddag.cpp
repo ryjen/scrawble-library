@@ -4,7 +4,7 @@ namespace lexicon
 {
     gaddag::gaddag() : trie()
     {
-        reverse_ = std::make_shared<node>('<');
+        reverse_ = std::make_shared<node>(node::DIRSYM);
         nodeCount_++;
     }
 
@@ -25,10 +25,10 @@ namespace lexicon
         for (int i = 1, size = word.length(); i < size; ++i) {
             prefix = word.substr(0, i);
             std::string reverse(prefix.rbegin(), prefix.rend());
-            push_prefix(prefix + ">" + word.substr(i));
+            push_prefix(prefix + std::to_string(node::DIRSYM) + word.substr(i));
         }
         std::string reverse(word.rbegin(), word.rend());
-        push_prefix(reverse + ">");
+        push_prefix(reverse + std::to_string(node::DIRSYM));
     }
 
     void gaddag::push_prefix(const std::string &prefix)

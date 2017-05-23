@@ -1,4 +1,5 @@
 #include <scrawble/board.h>
+#include <scrawble/lexicon/node.h>
 #include <exception>
 
 namespace scrawble
@@ -11,7 +12,7 @@ namespace scrawble
     {
         for (int j = 0; j < size; j++) {
             for (int i = 0; i < size; i++) {
-                values_[i][j] = '_';
+                values_[i][j] = lexicon::node::EMPTY;
                 wordBonus_[i][j] = 1;
                 letterBonus_[i][j] = 1;
             }
@@ -54,15 +55,15 @@ namespace scrawble
         return word ? wordBonus_[x][y] : letterBonus_[x][y];
     }
 
-    board::row board::operator[](int index)
+    board::row board::operator[](int index) const
     {
         if (index < 0 || index >= size) {
-            throw std::out_of_range();
+            throw std::out_of_range("invalid index for board");
         }
-        return row(values_[index]);
+        return board::row(values_[index]);
     }
 
-    board::row::row(char value[size])
+    board::row::row(char const value[size])
     {
         for (int i = 0; i < size; i++) {
             values_[i] = value[i];
@@ -72,7 +73,7 @@ namespace scrawble
     char board::row::operator[](int index) const
     {
         if (index < 0 || index >= size) {
-            throw std::out_of_range();
+            throw std::out_of_range("invalid index for board row");
         }
         return values_[index];
     }

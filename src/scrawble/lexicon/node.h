@@ -10,74 +10,37 @@ namespace lexicon
     class node
     {
        public:
+        static const char BEGIN;
+        static const char EMPTY;
+        static const char DIRSYM;
+
         typedef std::shared_ptr<node> ptr;
         typedef std::set<ptr> list_type;
 
         typedef list_type::iterator iterator;
         typedef list_type::const_iterator const_iterator;
 
-        iterator begin()
-        {
-            return children_.begin();
-        }
-        iterator end()
-        {
-            return children_.end();
-        }
-        node() : value_()
-        {
-        }
-        node(char value) : value_(value)
-        {
-        }
+        iterator begin();
+        iterator begin() const;
+        iterator end();
+        iterator end() const;
 
-        virtual ~node()
-        {
-        }
-        char value() const
-        {
-            return value_;
-        }
-        void value(char value)
-        {
-            value_ = value;
-        }
-        bool marker() const
-        {
-            return marker_;
-        }
-        void mark(bool value)
-        {
-            marker_ = value;
-        }
+        node();
+        node(char value);
 
-        node::ptr find(char c) const
-        {
-            for (auto node : children_) {
-                if (node->value_ == c) {
-                    return node;
-                }
-            }
-            return nullptr;
-        }
+        virtual ~node();
+        char value() const;
+        void value(char value);
+        bool marker() const;
+        void mark(bool value);
 
-        node &push(const ptr &value)
-        {
-            children_.insert(value);
-            return *this;
-        }
+        node::ptr find(char c) const;
 
-        node::ptr push(char c)
-        {
-            auto n = std::make_shared<node>(c);
-            children_.insert(n);
-            return n;
-        }
+        node &push(const ptr &value);
 
-        const list_type children() const
-        {
-            return children_;
-        }
+        node::ptr push(char c);
+
+        const list_type children() const;
 
        private:
         char value_;

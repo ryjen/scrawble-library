@@ -36,9 +36,11 @@ namespace lexicon
         std::string word_;
         int score_;
         std::vector<data> placed_;
+        direction::type direction_;
 
        public:
-        move(const point &start, const std::string &word) : start_(start), word_(word), score_(0)
+        move(const point &start, const std::string &word, direction::type dir)
+            : start_(start), word_(word), score_(0), direction_(dir)
         {
         }
 
@@ -46,6 +48,11 @@ namespace lexicon
         {
             placed_.push_back(value);
             return *this;
+        }
+
+        bool operator<(const move &other) const
+        {
+            return word_ < other.word_;
         }
     };
 }

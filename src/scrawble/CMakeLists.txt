@@ -4,6 +4,7 @@ set(LIBRARY_FILES
 	board.cpp
 	bag.cpp
 	lexicon/gaddag.cpp
+	lexicon/node.cpp
 )
 
 

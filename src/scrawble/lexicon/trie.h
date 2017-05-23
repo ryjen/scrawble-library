@@ -14,8 +14,8 @@ namespace lexicon
 
         trie() : root_()
         {
-            root_ = std::make_shared<node>('~');
-            end_ = std::make_shared<node>('_');
+            root_ = std::make_shared<node>(lexicon::node::BEGIN);
+            end_ = std::make_shared<node>(lexicon::node::EMPTY);
             nodeCount_ = 1;
             wordCount_ = 0;
             maxDepth_ = 0;
@@ -28,7 +28,18 @@ namespace lexicon
         {
             return root_->begin();
         }
+
+        iterator begin() const
+        {
+            return root_->begin();
+        }
+
         iterator end()
+        {
+            return root_->end();
+        }
+
+        iterator end() const
         {
             return root_->end();
         }

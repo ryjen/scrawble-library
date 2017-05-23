@@ -8,10 +8,7 @@ namespace scrawble
     class tile
     {
        public:
-        static const char EMPTY = '_';
-        static const char DIRSYM = '>';
-
-        tile(const std::string &letter, int score) : score_(score), letter_(letter)
+        tile(const char &letter, int score) : score_(score), letter_(letter)
         {
         }
 
@@ -20,7 +17,7 @@ namespace scrawble
             return score_;
         }
 
-        std::string letter() const
+        char letter() const
         {
             return letter_;
         }
@@ -34,9 +31,19 @@ namespace scrawble
             return letter_ == other.letter_;
         }
 
+        bool operator<(const char &letter) const
+        {
+            return letter_ < letter;
+        }
+
+        bool operator==(const char &letter) const
+        {
+            return letter_ == letter;
+        }
+
        private:
         int score_;
-        std::string letter_;
+        char letter_;
     };
 }
 

@@ -6,15 +6,17 @@ int main(int argc, char *argv[])
 {
     scrawble::config config;
 
+    std::cout << "Loading, please wait...\n";
+
     config.load();
 
-    scrawble::game handler(config);
+    scrawble::game game(config);
 
     do {
-        handler.render();
+        game.render();
 
-        handler.update();
-    } while (!handler.is_over());
+        game.update();
+    } while (!game.is_over());
 
     return EXIT_SUCCESS;
 }
