@@ -28,6 +28,7 @@ namespace scrawble
         int turn_;
 
        private:
+        static const int max_players = 4;
         static const int this_player_index = 0;
     };
 }

@@ -7,7 +7,7 @@
 
 namespace scrawble
 {
-    game_logic::game_logic()
+    game_logic::game_logic() : players_(max_players)
     {
     }
 
