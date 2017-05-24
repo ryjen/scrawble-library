@@ -1,33 +1,30 @@
 
-set(LIBRARY_FILES
-	scrawble.cpp
+set(SOURCE_FILES
+	game_logic.cpp
+	algorithm.cpp
 	board.cpp
 	bag.cpp
 	lexicon/gaddag.cpp
-)
-
-
-add_library(${PROJECT_NAME}_algo ${LIBRARY_FILES})
-
-set(SOURCE_FILES 
-	vt100.cpp
-	player.cpp
+	lexicon/node.cpp
 	config.cpp
-	io.cpp
-	main.cpp
+	player.cpp
 )
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
-target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_algo ${CURSES_LIBRARIES})
+add_library(${PROJECT_NAME} ${SOURCE_FILES})
 
 set(HEADER_FILES
-	scrawble.h
-	game.h
+	game_logic.h
+	algorith.h
 	lexicon/gaddag.h
 	lexicon/trie.h
 	lexicon/loader.h
 	lexicon/node.h
+	player.h
+	tile.h
+	config.h
+	board.h
+	bag.h
 )
 
 INSTALL(FILES ${HEADER_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME})

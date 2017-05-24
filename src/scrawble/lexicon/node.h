@@ -5,82 +5,51 @@
 #include <set>
 #include <string>
 
-class node
+namespace scrawble
 {
-   public:
-    typedef std::shared_ptr<node> ptr;
-    typedef std::set<ptr> list_type;
+    namespace lexicon
+    {
+        class node
+        {
+           public:
+            static const char BEGIN;
+            static const char EMPTY;
+            static const char DIRSYM;
 
-    typedef list_type::iterator iterator;
-    typedef list_type::const_iterator const_iterator;
+            typedef std::shared_ptr<node> ptr;
+            typedef std::set<ptr> list_type;
 
-    iterator begin()
-    {
-        return children_.begin();
-    }
-    iterator end()
-    {
-        return children_.end();
-    }
-    node() : value_()
-    {
-    }
-    node(char value) : value_(value)
-    {
-    }
+            typedef list_type::iterator iterator;
+            typedef list_type::const_iterator const_iterator;
 
-    virtual ~node()
-    {
-    }
-    char value() const
-    {
-        return value_;
-    }
-    void value(char value)
-    {
-        value_ = value;
-    }
-    bool marker() const
-    {
-        return marker_;
-    }
-    void mark(bool value)
-    {
-        marker_ = value;
-    }
+            iterator begin();
+            iterator begin() const;
+            iterator end();
+            iterator end() const;
 
-    node::ptr find(char c)
-    {
-        for (auto node : children_) {
-            if (node->value_ == c) {
-                return node;
-            }
-        }
-        return nullptr;
-    }
+            node();
+            node(char value);
 
-    node &push(const ptr &value)
-    {
-        children_.insert(value);
-        return *this;
-    }
+            virtual ~node();
+            char value() const;
+            void value(char value);
+            bool marker() const;
+            void mark(bool value);
 
-    node::ptr push(char c)
-    {
-        auto n = std::make_shared<node>(c);
-        children_.insert(n);
-        return n;
-    }
+            node::ptr find(char c) const;
 
-    const list_type children() const
-    {
-        return children_;
-    }
+            node &push(const ptr &value);
 
-   private:
-    char value_;
-    bool marker_;
-    list_type children_;
-};
+            node::ptr push(char c);
+
+            const list_type children() const;
+
+           private:
+            char value_;
+            bool marker_;
+            list_type children_;
+        };
+    }
+}
 
 #endif

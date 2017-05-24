@@ -4,43 +4,59 @@
 #include <array>
 #include <vector>
 
-namespace lexicon
+namespace scrawble
 {
-    class move
+    namespace lexicon
     {
-       private:
         typedef struct __point {
             int x;
             int y;
             __point(int x, int y) : x(x), y(y)
             {
             }
-        } point;
-
-        typedef struct __data {
-            char c;
-            point p;
-            __data(char c, const point &p) : c(c), p(p)
+            __point() : x(0), y(0)
             {
             }
-        } data;
+        } point;
 
-        point start_;
-        std::string word_;
-        int score_;
-        std::vector<data> placed_;
-
-       public:
-        move(const point &start, const std::string &word) : start_(start), word_(word), score_(0)
+        namespace direction
         {
+            typedef enum { left, right, up, down } type;
         }
 
-        move &push(const data &value)
+        class move
         {
-            placed_.push_back(value);
-            return *this;
-        }
-    };
+            typedef struct __data {
+                char c;
+                point p;
+                __data(char c, const point &p) : c(c), p(p)
+                {
+                }
+            } data;
+
+            point start_;
+            std::string word_;
+            int score_;
+            std::vector<data> placed_;
+            direction::type direction_;
+
+           public:
+            move(const point &start, const std::string &word, direction::type dir)
+                : start_(start), word_(word), score_(0), direction_(dir)
+            {
+            }
+
+            move &push(const data &value)
+            {
+                placed_.push_back(value);
+                return *this;
+            }
+
+            bool operator<(const move &other) const
+            {
+                return word_ < other.word_;
+            }
+        };
+    }
 }
-
 #endif

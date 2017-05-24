@@ -31,6 +31,16 @@ namespace scrawble
             return letter_ == other.letter_;
         }
 
+        bool operator<(const char &letter) const
+        {
+            return letter_ < letter;
+        }
+
+        bool operator==(const char &letter) const
+        {
+            return letter_ == letter;
+        }
+
        private:
         int score_;
         char letter_;

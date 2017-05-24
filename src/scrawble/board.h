@@ -15,10 +15,24 @@ namespace scrawble
 
         board();
 
-        void initialize();
+        void init();
 
         char value(int x, int y);
+
         short bonus(int x, int y, bool word = false);
+
+        class row
+        {
+           public:
+            row(char const value[size]);
+
+            char operator[](int index) const;
+
+           private:
+            char values_[size];
+        };
+
+        row operator[](int index) const;
 
        private:
         char values_[size][size];

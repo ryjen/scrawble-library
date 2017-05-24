@@ -1,6 +1,4 @@
-#include "player.h"
-#include <scrawble/vt100.h>
-#include <algorithm>
+#include <scrawble/player.h>
 #include <iostream>
 #include <random>
 
@@ -37,7 +35,6 @@ namespace scrawble
         std::shuffle(rack_.begin(), rack_.end(), g);
         return *this;
     }
-
 
     const std::vector<tile>& player::rack() const
     {
