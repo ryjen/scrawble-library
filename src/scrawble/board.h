@@ -15,11 +15,13 @@ namespace scrawble
 
         board();
 
-        void init();
+        board& init();
 
         char value(int x, int y);
 
         short bonus(int x, int y, bool word = false);
+
+        board& place(int x, int y, char value);
 
         class row
         {

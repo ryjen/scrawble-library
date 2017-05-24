@@ -8,7 +8,7 @@ namespace scrawble
     {
     }
 
-    void board::init()
+    board& board::init()
     {
         for (int j = 0; j < size; j++) {
             for (int i = 0; i < size; i++) {
@@ -43,6 +43,8 @@ namespace scrawble
         loader(wordBonus_, doubleW.begin(), doubleW.end(), 2);
         loader(letterBonus_, tripleCh.begin(), tripleCh.end(), 3);
         loader(letterBonus_, doubleCh.begin(), doubleCh.end(), 2);
+
+        return *this;
     }
 
     char board::value(int x, int y)
@@ -76,5 +78,15 @@ namespace scrawble
             throw std::out_of_range("invalid index for board row");
         }
         return values_[index];
+    }
+
+    board& board::place(int x, int y, char value)
+    {
+        if (x < 0 || x >= size || y < 0 || y >= size) {
+            throw std::out_of_range("invalid index for board place");
+        }
+
+        values_[x][y] = value;
+        return *this;
     }
 }

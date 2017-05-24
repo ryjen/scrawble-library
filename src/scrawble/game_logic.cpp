@@ -21,14 +21,15 @@ namespace scrawble
         return board_;
     }
 
-    void game_logic::finish_turn()
+    game_logic &game_logic::finish_turn()
     {
         if (++turn_ > players_.size()) {
             turn_ = 0;
         }
+        return *this;
     }
 
-    void game_logic::init(const config &conf)
+    game_logic &game_logic::init(const config &conf)
     {
         init_dictionary(conf.dictionary_file_name());
 
@@ -43,5 +44,7 @@ namespace scrawble
         for (int i = 0; i < player::rack_size; i++) {
             plr.push(bag_.next());
         }
+
+        return *this;
     }
 }

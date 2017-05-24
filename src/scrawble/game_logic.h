@@ -18,9 +18,9 @@ namespace scrawble
 
         board &get_board();
 
-        void finish_turn();
+        game_logic &finish_turn();
 
-        void init(const config &conf);
+        game_logic &init(const config &conf);
 
        protected:
         bag bag_;

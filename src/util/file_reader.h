@@ -20,6 +20,7 @@ class file_reader
     {
         assert(input_.is_open());
     }
+
     virtual ~file_reader()
     {
         input_.close();
