@@ -1,6 +1,8 @@
 #include <scrawble/player.h>
 #include <iostream>
 #include <random>
+#include <string>
+#include <algorithm>
 
 namespace scrawble
 {

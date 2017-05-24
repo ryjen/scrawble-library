@@ -1,5 +1,7 @@
 #include <scrawble/bag.h>
 #include <random>
+#include <stdexcept>
+#include <memory>
 
 namespace scrawble
 {

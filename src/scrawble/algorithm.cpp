@@ -1,4 +1,5 @@
 #include <scrawble/algorithm.h>
+#include <algorithm>
 
 namespace scrawble
 {
@@ -36,19 +37,19 @@ namespace scrawble
             tmp.node = this->node->find(del);
             switch (tmp.direction) {
                 case lexicon::direction::left:
-                    tmp.word = std::to_string(del) + this->word;
+                    tmp.word = del + this->word;
                     tmp.actual = lexicon::point(actual.x - 1, actual.y);
                     break;
                 case lexicon::direction::right:
-                    tmp.word = this->word + std::to_string(del);
+                    tmp.word = this->word + del;
                     tmp.actual = lexicon::point(actual.x + 1, actual.y);
                     break;
                 case lexicon::direction::up:
-                    tmp.word = std::to_string(del) + this->word;
+                    tmp.word = del + this->word;
                     tmp.actual = lexicon::point(actual.x, actual.y - 1);
                     break;
                 case lexicon::direction::down:
-                    tmp.word = this->word + std::to_string(del);
+                    tmp.word = this->word + del;
                     tmp.actual = lexicon::point(actual.x, actual.y + 1);
                     break;
             }
@@ -117,7 +118,7 @@ namespace scrawble
         try {
             while (board_[actual][y] != lexicon::node::EMPTY) {
                 root = root->find(board_[actual][y]);
-                s = std::to_string(board_[actual][y]) + s;
+                s = board_[actual][y] + s;
                 actual--;
             }
 
@@ -143,7 +144,7 @@ namespace scrawble
         try {
             while (board_[x][actual] != lexicon::node::EMPTY) {
                 root = root->find(board_[x][actual]);
-                s = std::to_string(board_[actual][y]) + s;
+                s = board_[actual][y] + s;
                 actual--;
             }
 
