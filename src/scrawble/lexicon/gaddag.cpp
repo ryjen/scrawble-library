@@ -27,10 +27,10 @@ namespace scrawble
             for (int i = 1, size = word.length(); i < size; ++i) {
                 prefix = word.substr(0, i);
                 std::string reverse(prefix.rbegin(), prefix.rend());
-                push_prefix(prefix + std::to_string(node::DIRSYM) + word.substr(i));
+                push_prefix(prefix + node::DIRSYM + word.substr(i));
             }
             std::string reverse(word.rbegin(), word.rend());
-            push_prefix(reverse + std::to_string(node::DIRSYM));
+            push_prefix(reverse + node::DIRSYM);
         }
 
         void gaddag::push_prefix(const std::string &prefix)

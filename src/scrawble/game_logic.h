@@ -20,6 +20,8 @@ namespace scrawble
 
         game_logic &finish_turn();
 
+        bag &get_bag();
+
         game_logic &init(const config &conf);
 
        protected:

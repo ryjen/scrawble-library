@@ -15,7 +15,7 @@ namespace scrawble
             int score;
             int count;
             char letter;
-            tile(int score, int count, const char &letter) : score(score), count(count), letter(letter)
+            tile(int score, int count, char letter) : score(score), count(count), letter(letter)
             {
             }
         } tile;

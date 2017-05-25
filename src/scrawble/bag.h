@@ -3,6 +3,7 @@
 
 #include <scrawble/tile.h>
 #include <vector>
+#include <memory>
 
 namespace scrawble
 {
@@ -11,13 +12,13 @@ namespace scrawble
        public:
         typedef std::vector<tile> list_type;
 
-        class generator_type
+        class randomizer
         {
            public:
-            virtual int next(const list_type &letters) = 0;
+            virtual int next_index(const list_type &values) = 0;
         };
 
-        bag(const std::shared_ptr<generator_type> &generator = default_generator());
+        bag(const std::shared_ptr<randomizer> &randomizer = default_randomizer());
 
         bag &push(const tile &tile);
 
@@ -25,11 +26,13 @@ namespace scrawble
 
         bool empty() const;
 
+        tile next(char letter);
+
        private:
-        static std::shared_ptr<generator_type> default_generator();
+        static std::shared_ptr<randomizer> default_randomizer();
 
         list_type letters_;
-        std::shared_ptr<generator_type> generator_;
+        std::shared_ptr<randomizer> randomizer_;
     };
 }
 

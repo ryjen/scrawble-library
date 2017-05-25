@@ -62,13 +62,22 @@ namespace scrawble
         if (index < 0 || index >= size) {
             throw std::out_of_range("invalid index for board");
         }
-        return board::row(values_[index]);
+        char const* row_values = values_[index];
+
+        return board::row(row_values);
     }
 
     board::row::row(char const value[size])
     {
         for (int i = 0; i < size; i++) {
             values_[i] = value[i];
+        }
+    }
+
+    board::row::row(const row& other)
+    {
+        for (int i = 0; i < size; i++) {
+            values_[i] = other.values_[i];
         }
     }
 

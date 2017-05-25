@@ -15,18 +15,20 @@ namespace scrawble
 
         board();
 
-        board& init();
+        board &init();
 
         char value(int x, int y);
 
         short bonus(int x, int y, bool word = false);
 
-        board& place(int x, int y, char value);
+        board &place(int x, int y, char value);
 
         class row
         {
            public:
             row(char const value[size]);
+            row(const row &other);
+            row &operator=(const row &other);
 
             char operator[](int index) const;
 
