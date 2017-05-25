@@ -6,7 +6,7 @@
 
 using namespace bandit;
 
-class test_generator : public scrawble::bag::generator_type
+class test_generator : public scrawble::bag::randomizer
 {
    public:
     void letters(const std::initializer_list<char> &value)
@@ -15,7 +15,7 @@ class test_generator : public scrawble::bag::generator_type
             specified_.push(letter);
         }
     }
-    int next(const scrawble::bag::list_type &letters)
+    int next_index(const scrawble::bag::list_type &values)
     {
         if (specified_.empty()) {
             throw std::out_of_range("no more specified letters");
@@ -23,12 +23,12 @@ class test_generator : public scrawble::bag::generator_type
 
         auto next = specified_.front();
         specified_.pop();
-        auto it = std::find(std::begin(letters), std::end(letters), next);
-        if (it == letters.end()) {
+        auto it = std::find(std::begin(values), std::end(values), next);
+        if (it == values.end()) {
             throw std::out_of_range("specified letter not found");
         }
 
-        return std::distance(std::begin(letters), it);
+        return std::distance(std::begin(values), it);
     }
 
    private:
@@ -100,13 +100,16 @@ go_bandit([]() {
     describe("scrawble", [&game, &generator]() {
 
         it("can find the best move", [&game, &generator]() {
-            generator.letters({'C', 'O', 'W', 'Z', 'A', 'D', 'R'});
+            generator.letters({'C', 'O', 'S', 'Z', 'A', 'D', 'R'});
+
+            game->get_board().place(scrawble::board::size / 2, scrawble::board::size / 2,
+                                    game->get_bag().next('W').letter());
 
             std::set<scrawble::lexicon::move> pool;
 
             game->search(scrawble::board::size / 2, scrawble::board::size / 2, game->get_player().rack(), pool);
 
-            Assert::That(3, Equals(pool.size()));
+            Assert::That(pool.size(), Equals(3));
         });
 
     });

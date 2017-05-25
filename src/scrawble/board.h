@@ -21,10 +21,14 @@ namespace scrawble
 
         short bonus(int x, int y, bool word = false);
 
+        void place(int x, int y, char letter);
+
         class row
         {
            public:
             row(char const value[size]);
+            row(const row &other);
+            row &operator=(const row &other);
 
             char operator[](int index) const;
 

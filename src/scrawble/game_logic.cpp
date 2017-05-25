@@ -21,6 +21,11 @@ namespace scrawble
         return board_;
     }
 
+    bag &game_logic::get_bag()
+    {
+        return bag_;
+    }
+
     void game_logic::finish_turn()
     {
         if (++turn_ > players_.size()) {

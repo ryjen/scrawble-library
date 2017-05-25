@@ -18,6 +18,8 @@ namespace scrawble
 
         board &get_board();
 
+        bag &get_bag();
+
         void finish_turn();
 
         void init(const config &conf);
