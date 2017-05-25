@@ -1,4 +1,5 @@
 #include <scrawble/algorithm.h>
+#include <algorithm>
 
 namespace scrawble
 {

@@ -3,6 +3,7 @@
 
 #include <scrawble/tile.h>
 #include <vector>
+#include <memory>
 
 namespace scrawble
 {
