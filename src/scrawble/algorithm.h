@@ -4,6 +4,7 @@
 #include <scrawble/board.h>
 #include <scrawble/lexicon/gaddag.h>
 #include <scrawble/lexicon/move.h>
+#include <scrawble/rack.h>
 #include <scrawble/tile.h>
 #include <set>
 #include <stack>
@@ -20,7 +21,7 @@ namespace scrawble
        public:
         algorithm();
 
-        void search(int x, int y, const std::vector<tile> &rack, std::set<lexicon::move> &pool);
+        void search(int x, int y, const rack &rack, std::set<lexicon::move> &pool);
 
        protected:
         board board_;
@@ -31,13 +32,11 @@ namespace scrawble
        private:
         bool end_of_board(const temp::move &m) const;
 
-        char next_tile(const temp::move &m) const;
+        tile next_tile(const temp::move &m) const;
 
-        void recurse_left_right(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
-                                const std::vector<tile> &rack);
+        void recurse_left_right(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y, const rack &rack);
 
-        void recurse_up_down(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
-                             const std::vector<tile> &rack);
+        void recurse_up_down(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y, const rack &rack);
 
         void search_recursive(std::set<lexicon::move> &pool, const temp::move &m);
 

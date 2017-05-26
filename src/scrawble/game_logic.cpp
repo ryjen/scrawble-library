@@ -46,7 +46,7 @@ namespace scrawble
 
         player &plr = players_[this_player_index];
 
-        for (int i = 0; i < player::rack_size; i++) {
+        for (int i = 0; i < rack::size; i++) {
             plr.push(bag_.next());
         }
 

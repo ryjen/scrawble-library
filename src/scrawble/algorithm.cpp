@@ -12,10 +12,10 @@ namespace scrawble
             lexicon::direction::type direction;
             std::string word;
             lexicon::node::ptr node;
-            std::vector<tile> rack;
+            scrawble::rack rack;
 
             move(const lexicon::point start, const lexicon::point &actual, lexicon::direction::type dir,
-                 const std::string &word, const lexicon::node::ptr &node, const std::vector<tile> &rack);
+                 const std::string &word, const lexicon::node::ptr &node, const scrawble::rack &rack);
 
             move copy(char del) const;
 
@@ -25,7 +25,7 @@ namespace scrawble
         };
 
         move::move(const lexicon::point start, const lexicon::point &actual, lexicon::direction::type dir,
-                   const std::string &word, const lexicon::node::ptr &node, const std::vector<tile> &rack)
+                   const std::string &word, const lexicon::node::ptr &node, const scrawble::rack &rack)
             : start(start), left(), actual(actual), direction(dir), word(word), node(node), rack(rack)
         {
         }
@@ -33,7 +33,7 @@ namespace scrawble
         move move::copy(char del) const
         {
             move tmp(*this);
-            tmp.rack.erase(std::find(tmp.rack.begin(), tmp.rack.end(), del));
+            tmp.rack[std::distance(tmp.rack.begin(), std::find(tmp.rack.begin(), tmp.rack.end(), del))] = tile();
             tmp.node = this->node->find(del);
             switch (tmp.direction) {
                 case lexicon::direction::left:
@@ -77,7 +77,7 @@ namespace scrawble
         board_.init();
     }
 
-    void algorithm::search(int x, int y, const std::vector<tile> &rack, std::set<lexicon::move> &pool)
+    void algorithm::search(int x, int y, const rack &rack, std::set<lexicon::move> &pool)
     {
         lexicon::node::ptr root;
 
@@ -86,8 +86,8 @@ namespace scrawble
         }
 
         try {
-            if (board_[x][y + 1] != lexicon::node::EMPTY || board_[x][y - 1] != lexicon::node::EMPTY ||
-                (board_[x][y] != lexicon::node::EMPTY && board_[x + 1][y] == lexicon::node::EMPTY)) {
+            if (!board_[x][y + 1].empty() || !board_[x][y - 1].empty() ||
+                (!board_[x][y].empty() && board_[x + 1][y].empty())) {
                 root = dictionary_.reverse();
                 recurse_left_right(pool, root, x, y, rack);
             }
@@ -95,8 +95,8 @@ namespace scrawble
         }
 
         try {
-            if (board_[x + 1][y] != lexicon::node::EMPTY || board_[x - 1][y] != lexicon::node::EMPTY ||
-                (board_[x][y] != lexicon::node::EMPTY && board_[x][y + 1] == lexicon::node::EMPTY)) {
+            if (!board_[x + 1][y].empty() || !board_[x - 1][y].empty() ||
+                (!board_[x][y].empty() && board_[x][y + 1].empty())) {
                 root = dictionary_.reverse();
                 recurse_up_down(pool, root, x, y, rack);
             }
@@ -105,7 +105,7 @@ namespace scrawble
     }
 
     void algorithm::recurse_left_right(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
-                                       const std::vector<tile> &rack)
+                                       const rack &rack)
     {
         if (x < 0 || x >= board::size || y < 0 || y >= board::size) {
             return;
@@ -116,9 +116,9 @@ namespace scrawble
         int actual = x;
 
         try {
-            while (board_[actual][y] != lexicon::node::EMPTY) {
-                root = root->find(board_[actual][y]);
-                s = board_[actual][y] + s;
+            while (!board_[actual][y].empty()) {
+                root = root->find(board_[actual][y].letter());
+                s = board_[actual][y].letter() + s;
                 actual--;
             }
 
@@ -131,7 +131,7 @@ namespace scrawble
     }
 
     void algorithm::recurse_up_down(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
-                                    const std::vector<tile> &rack)
+                                    const rack &rack)
     {
         if (x < 0 || x >= board::size || y < 0 || y >= board::size) {
             return;
@@ -142,9 +142,9 @@ namespace scrawble
         int actual = y;
 
         try {
-            while (board_[x][actual] != lexicon::node::EMPTY) {
-                root = root->find(board_[x][actual]);
-                s = board_[actual][y] + s;
+            while (!board_[x][actual].empty()) {
+                root = root->find(board_[x][actual].letter());
+                s = board_[actual][y].letter() + s;
                 actual--;
             }
 
@@ -177,16 +177,16 @@ namespace scrawble
             return;
         }
 
-        auto letter = next_tile(m);
+        auto tile = next_tile(m);
 
-        if (letter != lexicon::node::EMPTY) {
-            if (m.node->find(letter)) {
-                search_recursive(pool, m.copy(letter));
+        if (!tile.empty()) {
+            if (m.node->find(tile.letter())) {
+                search_recursive(pool, m.copy(tile.letter()));
             }
         } else {
-            for (auto tile : m.rack) {
-                if (m.node->find(tile.letter())) {
-                    search_recursive(pool, m.copy(tile.letter()));
+            for (auto t : m.rack) {
+                if (m.node->find(t.letter())) {
+                    search_recursive(pool, m.copy(t.letter()));
                 }
             }
         }
@@ -206,7 +206,7 @@ namespace scrawble
         }
     }
 
-    char algorithm::next_tile(const temp::move &m) const
+    tile algorithm::next_tile(const temp::move &m) const
     {
         switch (m.direction) {
             case lexicon::direction::left:
@@ -229,23 +229,23 @@ namespace scrawble
             case lexicon::direction::left:
             case lexicon::direction::right:
                 try {
-                    if (board_[x][y + 1] == lexicon::node::EMPTY && board_[x][y - 1] == lexicon::node::EMPTY) {
+                    if (board_[x][y + 1].empty() && board_[x][y - 1].empty()) {
                         return true;
                     }
                 } catch (const std::out_of_range &e) {
                 }
-                while (--y > 0 && board_[x][y] != lexicon::node::EMPTY) {
+                while (--y > 0 && !board_[x][y].empty()) {
                 }
                 return contains(x, y, true, x, y, ch);
             case lexicon::direction::up:
             case lexicon::direction::down:
                 try {
-                    if (board_[x + 1][y] == lexicon::node::EMPTY && board_[x - 1][y] == lexicon::node::EMPTY) {
+                    if (board_[x + 1][y].empty() && board_[x - 1][y].empty()) {
                         return true;
                     }
                 } catch (const std::out_of_range &e) {
                 }
-                while (--x > 0 && board_[x][y] != lexicon::node::EMPTY) {
+                while (--x > 0 && !board_[x][y].empty()) {
                 }
                 return contains(x, y, false, x, y, ch);
         }
@@ -261,8 +261,8 @@ namespace scrawble
 
         auto node = *it;
 
-        while (board_[x1][y1] != lexicon::node::EMPTY) {
-            auto tmp = node->find(board_[x1][y1]);
+        while (!board_[x1][y1].empty()) {
+            auto tmp = node->find(board_[x1][y1].letter());
             if (!tmp) {
                 return false;
             }
@@ -286,8 +286,10 @@ namespace scrawble
                 else
                     x1++;
             }
-            if (x1 >= board::size) return node->marker();
-            if (y1 >= board::size) return node->marker();
+            if (x1 >= board::size)
+                return node->marker();
+            if (y1 >= board::size)
+                return node->marker();
         }
         return node->marker();
     }

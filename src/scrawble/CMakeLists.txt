@@ -8,6 +8,7 @@ set(SOURCE_FILES
 	lexicon/node.cpp
 	config.cpp
 	player.cpp
+	tile.cpp
 )
 
 add_library(${PROJECT_NAME} ${SOURCE_FILES})

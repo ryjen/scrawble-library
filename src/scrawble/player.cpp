@@ -1,31 +1,62 @@
 #include <scrawble/player.h>
+#include <algorithm>
 #include <iostream>
 #include <random>
 #include <string>
-#include <algorithm>
 
 namespace scrawble
 {
     player& player::push(const tile& tile)
     {
-        if (rack_.size() < rack_size) {
-            rack_.push_back(tile);
+        rack_.push(tile);
+        return *this;
+    }
+
+    tile player::replace(size_t index, const tile& tile)
+    {
+        if (index >= rack::size) {
+            throw std::out_of_range("invalid index for player replace");
+        }
+
+        auto existing = rack_[index];
+
+        rack_[index] = tile;
+
+        return existing;
+    }
+
+    player& player::pop(const tile& t)
+    {
+        auto it = std::find(rack_.begin(), rack_.end(), t);
+        if (it != rack_.end()) {
+            *it = tile();
         }
         return *this;
     }
 
-    player& player::pop(const tile& tile)
+    tile player::pop(size_t index)
     {
-        auto it = std::find(rack_.begin(), rack_.end(), tile);
-        if (it != rack_.end()) {
-            rack_.erase(it);
+        if (index >= rack::size) {
+            throw std::out_of_range("invalid index for player pop");
         }
-        return *this;
+        auto t = rack_[index];
+        rack_[index] = tile();
+        return t;
+    }
+
+    tile player::get(size_t index)
+    {
+        if (index >= rack::size) {
+            return tile();
+        }
+        return rack_[index];
     }
 
     player& player::clear()
     {
-        rack_.clear();
+        for (int i = 0; i < rack::size; i++) {
+            rack_[i] = tile();
+        }
         return *this;
     }
 
@@ -38,7 +69,7 @@ namespace scrawble
         return *this;
     }
 
-    const std::vector<tile>& player::rack() const
+    const rack& player::get_rack() const
     {
         return rack_;
     }

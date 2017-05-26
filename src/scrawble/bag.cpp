@@ -1,7 +1,7 @@
 #include <scrawble/bag.h>
+#include <memory>
 #include <random>
 #include <stdexcept>
-#include <memory>
 
 namespace scrawble
 {
@@ -14,7 +14,7 @@ namespace scrawble
             {
                 std::random_device rd;
                 std::mt19937 gen(rd());
-                std::uniform_int_distribution<> dis(0, values.size());
+                std::uniform_int_distribution<> dis(0, values.size() - 1);
                 return dis(gen);
             }
         };

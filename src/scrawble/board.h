@@ -1,6 +1,7 @@
 #ifndef SCRAWBLE_BOARD_H
 #define SCRAWBLE_BOARD_H
 
+#include <scrawble/tile.h>
 #include <array>
 #include <iostream>
 #include <iterator>
@@ -17,31 +18,31 @@ namespace scrawble
 
         board &init();
 
-        char value(int x, int y);
+        tile &value(int x, int y);
 
         short bonus(int x, int y, bool word = false);
 
-        board &place(int x, int y, char value);
+        tile place(int x, int y, const tile &value);
 
         board &reset(int x, int y);
 
         class row
         {
            public:
-            row(char const value[size]);
+            row(tile const value[size]);
             row(const row &other);
             row &operator=(const row &other);
 
-            char operator[](int index) const;
+            tile operator[](int index) const;
 
            private:
-            char values_[size];
+            tile values_[size];
         };
 
         row operator[](int index) const;
 
        private:
-        char values_[size][size];
+        tile values_[size][size];
         short wordBonus_[size][size];
         short letterBonus_[size][size];
     };

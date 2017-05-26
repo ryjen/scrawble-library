@@ -8,38 +8,23 @@ namespace scrawble
     class tile
     {
        public:
-        tile(const char &letter, int score) : score_(score), letter_(letter)
-        {
-        }
+        tile();
 
-        int score() const
-        {
-            return score_;
-        }
+        tile(const char &letter, int score);
 
-        char letter() const
-        {
-            return letter_;
-        }
+        bool empty() const;
 
-        bool operator<(const tile &other) const
-        {
-            return letter_ < other.letter_;
-        }
-        bool operator==(const tile &other) const
-        {
-            return letter_ == other.letter_;
-        }
+        int score() const;
 
-        bool operator<(const char &letter) const
-        {
-            return letter_ < letter;
-        }
+        char letter() const;
 
-        bool operator==(const char &letter) const
-        {
-            return letter_ == letter;
-        }
+        bool operator<(const tile &other) const;
+
+        bool operator==(const tile &other) const;
+
+        bool operator<(const char &letter) const;
+
+        bool operator==(const char &letter) const;
 
        private:
         int score_;

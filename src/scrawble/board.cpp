@@ -12,7 +12,7 @@ namespace scrawble
     {
         for (int j = 0; j < size; j++) {
             for (int i = 0; i < size; i++) {
-                values_[i][j] = lexicon::node::EMPTY;
+                values_[i][j] = tile();
                 wordBonus_[i][j] = 1;
                 letterBonus_[i][j] = 1;
             }
@@ -47,7 +47,7 @@ namespace scrawble
         return *this;
     }
 
-    char board::value(int x, int y)
+    tile& board::value(int x, int y)
     {
         return values_[x][y];
     }
@@ -62,12 +62,12 @@ namespace scrawble
         if (index < 0 || index >= size) {
             throw std::out_of_range("invalid index for board");
         }
-        char const* row_values = values_[index];
+        tile const* row_values = values_[index];
 
         return board::row(row_values);
     }
 
-    board::row::row(char const value[size])
+    board::row::row(tile const value[size])
     {
         for (int i = 0; i < size; i++) {
             values_[i] = value[i];
@@ -81,7 +81,7 @@ namespace scrawble
         }
     }
 
-    char board::row::operator[](int index) const
+    tile board::row::operator[](int index) const
     {
         if (index < 0 || index >= size) {
             throw std::out_of_range("invalid index for board row");
@@ -89,14 +89,17 @@ namespace scrawble
         return values_[index];
     }
 
-    board& board::place(int x, int y, char value)
+    tile board::place(int x, int y, const tile& value)
     {
         if (x < 0 || x >= size || y < 0 || y >= size) {
             throw std::out_of_range("invalid index for board place");
         }
 
+        auto existing = values_[x][y];
+
         values_[x][y] = value;
-        return *this;
+
+        return existing;
     }
 
     board& board::reset(int x, int y)
@@ -105,7 +108,7 @@ namespace scrawble
             throw std::out_of_range("invalid index for board place");
         }
 
-        values_[x][y] = lexicon::node::EMPTY;
+        values_[x][y] = tile();
         return *this;
     }
 }

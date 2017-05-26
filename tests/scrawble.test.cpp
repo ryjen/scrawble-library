@@ -102,12 +102,11 @@ go_bandit([]() {
         it("can find the best move", [&game, &generator]() {
             generator.letters({'C', 'O', 'S', 'Z', 'A', 'D', 'R'});
 
-            game->get_board().place(scrawble::board::size / 2, scrawble::board::size / 2,
-                                    game->get_bag().next('W').letter());
+            game->get_board().place(scrawble::board::size / 2, scrawble::board::size / 2, game->get_bag().next('W'));
 
             std::set<scrawble::lexicon::move> pool;
 
-            game->search(scrawble::board::size / 2, scrawble::board::size / 2, game->get_player().rack(), pool);
+            game->search(scrawble::board::size / 2, scrawble::board::size / 2, game->get_player().get_rack(), pool);
 
             Assert::That(pool.size(), Equals(3));
         });
