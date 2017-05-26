@@ -98,4 +98,14 @@ namespace scrawble
         values_[x][y] = value;
         return *this;
     }
+
+    board& board::reset(int x, int y)
+    {
+        if (x < 0 || x >= size || y < 0 || y >= size) {
+            throw std::out_of_range("invalid index for board place");
+        }
+
+        values_[x][y] = lexicon::node::EMPTY;
+        return *this;
+    }
 }

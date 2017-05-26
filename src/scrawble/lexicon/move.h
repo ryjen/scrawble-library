@@ -14,8 +14,12 @@ namespace scrawble
             __point(int x, int y) : x(x), y(y)
             {
             }
-            __point() : x(0), y(0)
+            __point() : x(-1), y(-1)
             {
+            }
+            bool valid() const
+            {
+                return x >= 0 && y >= 0;
             }
         } point;
 

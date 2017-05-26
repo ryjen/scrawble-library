@@ -23,6 +23,8 @@ namespace scrawble
 
         board &place(int x, int y, char value);
 
+        board &reset(int x, int y);
+
         class row
         {
            public:
