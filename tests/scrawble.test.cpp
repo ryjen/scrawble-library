@@ -108,6 +108,10 @@ go_bandit([]() {
 
             game->search(scrawble::board::size / 2, scrawble::board::size / 2, game->get_player().get_rack(), pool);
 
+            for (auto &m : pool) {
+                printf("[%d,%d] %s\n", m.get_point().x, m.get_point().y, m.get_word().c_str());
+            }
+
             Assert::That(pool.size(), Equals(3));
         });
 

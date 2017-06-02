@@ -1,5 +1,6 @@
 #include <scrawble/algorithm.h>
 #include <algorithm>
+#include <cassert>
 
 namespace scrawble
 {
@@ -35,6 +36,7 @@ namespace scrawble
             move tmp(*this);
             tmp.rack[std::distance(tmp.rack.begin(), std::find(tmp.rack.begin(), tmp.rack.end(), del))] = tile();
             tmp.node = this->node->find(del);
+            assert(tmp.node != nullptr);
             switch (tmp.direction) {
                 case lexicon::direction::left:
                     tmp.word = del + this->word;
@@ -62,7 +64,8 @@ namespace scrawble
             tmp.direction = dir;
             tmp.start = lexicon::point(actual.x, actual.y);
             tmp.actual = lexicon::point(start.x, start.y);
-            tmp.node = node->find('>');
+            tmp.node = node->find(lexicon::node::DIRSYM);
+            assert(tmp.node != nullptr);
             return tmp;
         }
 
@@ -89,7 +92,9 @@ namespace scrawble
             if (!board_[x][y + 1].empty() || !board_[x][y - 1].empty() ||
                 (!board_[x][y].empty() && board_[x + 1][y].empty())) {
                 root = dictionary_.reverse();
-                recurse_left_right(pool, root, x, y, rack);
+                if (root != nullptr) {
+                    recurse_left_right(pool, root, x, y, rack);
+                }
             }
         } catch (const std::out_of_range &e) {
         }
@@ -98,7 +103,9 @@ namespace scrawble
             if (!board_[x + 1][y].empty() || !board_[x - 1][y].empty() ||
                 (!board_[x][y].empty() && board_[x][y + 1].empty())) {
                 root = dictionary_.reverse();
-                recurse_up_down(pool, root, x, y, rack);
+                if (root != nullptr) {
+                    recurse_up_down(pool, root, x, y, rack);
+                }
             }
         } catch (const std::out_of_range &e) {
         }
@@ -117,7 +124,10 @@ namespace scrawble
 
         try {
             while (!board_[actual][y].empty()) {
-                root = root->find(board_[actual][y].letter());
+                auto tmp = root->find(board_[actual][y].letter());
+                if (tmp != nullptr) {
+                    root = tmp;
+                }
                 s = board_[actual][y].letter() + s;
                 actual--;
             }
@@ -143,7 +153,10 @@ namespace scrawble
 
         try {
             while (!board_[x][actual].empty()) {
-                root = root->find(board_[x][actual].letter());
+                auto tmp = root->find(board_[x][actual].letter());
+                if (tmp != nullptr) {
+                    root = tmp;
+                }
                 s = board_[actual][y].letter() + s;
                 actual--;
             }

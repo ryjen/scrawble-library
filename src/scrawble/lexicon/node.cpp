@@ -54,8 +54,10 @@ namespace scrawble
 
         node::ptr node::find(char c) const
         {
+            char ch = toupper(c);
+
             for (auto node : children_) {
-                if (node->value_ == c) {
+                if (node->value_ == ch) {
                     return node;
                 }
             }
@@ -70,7 +72,7 @@ namespace scrawble
 
         node::ptr node::push(char c)
         {
-            auto n = std::make_shared<node>(c);
+            auto n = std::make_shared<node>(toupper(c));
             children_.insert(n);
             return n;
         }

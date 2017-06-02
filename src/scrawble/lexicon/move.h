@@ -60,6 +60,16 @@ namespace scrawble
             {
                 return word_ < other.word_;
             }
+
+            const std::string &get_word() const
+            {
+                return word_;
+            }
+
+            const point &get_point() const
+            {
+                return start_;
+            }
         };
     }
 }
