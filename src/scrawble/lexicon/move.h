@@ -45,8 +45,8 @@ namespace scrawble
             direction::type direction_;
 
            public:
-            move(const point &start, const std::string &word, direction::type dir)
-                : start_(start), word_(word), score_(0), direction_(dir)
+            move(const point &start, const std::string &word, direction::type dir, int score)
+                : start_(start), word_(word), score_(score), direction_(dir)
             {
             }
 
@@ -69,6 +69,11 @@ namespace scrawble
             const point &get_point() const
             {
                 return start_;
+            }
+
+            const int get_score() const
+            {
+                return score_;
             }
         };
     }

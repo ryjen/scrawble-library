@@ -1,3 +1,4 @@
+#include <scrawble/game_logic.h>
 #include <scrawble/player.h>
 #include <algorithm>
 #include <iostream>
@@ -62,15 +63,22 @@ namespace scrawble
 
     player& player::shuffle()
     {
-        std::random_device rd;
-        std::mt19937 g(rd());
-
-        std::shuffle(rack_.begin(), rack_.end(), g);
+        std::shuffle(rack_.begin(), rack_.end(), game_logic::random_generator);
         return *this;
     }
 
     const rack& player::get_rack() const
     {
         return rack_;
+    }
+
+    player& player::fill(bag& bag)
+    {
+        for (int i = 0; i < rack::size; i++) {
+            if (rack_[i].empty()) {
+                rack_.set(i, bag.next());
+            }
+        }
+        return *this;
     }
 }

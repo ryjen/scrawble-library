@@ -32,7 +32,16 @@ namespace scrawble
             }
             throw std::out_of_range("no more room in rack push");
         }
-
+        rack &set(size_t index, const tile &value)
+        {
+            if (index >= size) {
+                throw std::out_of_range("no more room in rack push");
+            }
+            if (values_[index].empty()) {
+                values_[index] = value;
+            }
+            return *this;
+        }
         tile pop(size_t index)
         {
             if (index >= size) {

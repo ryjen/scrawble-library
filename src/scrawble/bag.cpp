@@ -1,34 +1,10 @@
 #include <scrawble/bag.h>
+#include <scrawble/game_logic.h>
 #include <memory>
-#include <random>
 #include <stdexcept>
 
 namespace scrawble
 {
-    namespace detail
-    {
-        class default_randomizer : public bag::randomizer
-        {
-           public:
-            int next_index(const bag::list_type &values)
-            {
-                std::random_device rd;
-                std::mt19937 gen(rd());
-                std::uniform_int_distribution<> dis(0, values.size() - 1);
-                return dis(gen);
-            }
-        };
-    }
-
-    std::shared_ptr<bag::randomizer> bag::default_randomizer()
-    {
-        return std::make_shared<detail::default_randomizer>();
-    }
-
-    bag::bag(const std::shared_ptr<randomizer> &randomizer) : randomizer_(randomizer)
-    {
-    }
-
     bag &bag::push(const tile &tile)
     {
         letters_.push_back(tile);
@@ -46,7 +22,9 @@ namespace scrawble
             throw std::out_of_range("No more letters");
         }
 
-        auto index = randomizer_->next_index(letters_);
+        std::uniform_int_distribution<> dis(0, letters_.size() - 1);
+
+        auto index = dis(game_logic::random_generator);
 
         if (index < 0 || index >= letters_.size()) {
             throw std::out_of_range("invalid generated index");

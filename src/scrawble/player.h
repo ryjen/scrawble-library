@@ -1,6 +1,7 @@
 #ifndef SCRAWBLE_PLAYER_H
 #define SCRAWBLE_PLAYER_H
 
+#include <scrawble/bag.h>
 #include <scrawble/rack.h>
 #include <scrawble/tile.h>
 #include <string>
@@ -26,6 +27,8 @@ namespace scrawble
         const rack& get_rack() const;
 
         player& clear();
+
+        player& fill(bag& bag);
 
        private:
         rack rack_;

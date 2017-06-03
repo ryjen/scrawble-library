@@ -7,6 +7,8 @@
 
 namespace scrawble
 {
+    std::mt19937 game_logic::random_generator;
+
     game_logic::game_logic() : players_(max_players)
     {
     }
@@ -43,13 +45,6 @@ namespace scrawble
                 bag_.push(tile(t.letter, t.score));
             }
         }
-
-        player &plr = players_[this_player_index];
-
-        for (int i = 0; i < rack::size; i++) {
-            plr.push(bag_.next());
-        }
-
         return *this;
     }
 }

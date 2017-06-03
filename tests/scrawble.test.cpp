@@ -6,35 +6,6 @@
 
 using namespace bandit;
 
-class test_generator : public scrawble::bag::randomizer
-{
-   public:
-    void letters(const std::initializer_list<char> &value)
-    {
-        for (auto letter : value) {
-            specified_.push(letter);
-        }
-    }
-    int next_index(const scrawble::bag::list_type &values)
-    {
-        if (specified_.empty()) {
-            throw std::out_of_range("no more specified letters");
-        }
-
-        auto next = specified_.front();
-        specified_.pop();
-        auto it = std::find(std::begin(values), std::end(values), next);
-        if (it == values.end()) {
-            throw std::out_of_range("specified letter not found");
-        }
-
-        return std::distance(std::begin(values), it);
-    }
-
-   private:
-    std::queue<char> specified_;
-};
-
 class test_config : public scrawble::config
 {
    public:
@@ -78,13 +49,25 @@ class test_game : public scrawble::game_logic
             dictionary_.push(line);
         }
     }
+
+    void set_player_rack(const std::initializer_list<char> &list)
+    {
+        for (auto ch : list) {
+            get_player().push(get_bag().next(ch));
+        }
+    }
+};
+
+struct order_by_score {
+    bool operator()(const scrawble::lexicon::move &a, const scrawble::lexicon::move &b) const
+    {
+        return a.get_score() > b.get_score();
+    }
 };
 
 go_bandit([]() {
 
     std::shared_ptr<test_game> game;
-
-    test_generator generator;
 
     before_each([&game]() {
 
@@ -97,10 +80,10 @@ go_bandit([]() {
         game->init(config);
     });
 
-    describe("scrawble", [&game, &generator]() {
+    describe("scrawble", [&game]() {
 
-        it("can find the best move", [&game, &generator]() {
-            generator.letters({'C', 'O', 'S', 'Z', 'A', 'D', 'R'});
+        it("can find the best move", [&game]() {
+            game->set_player_rack({'C', 'O', 'F', 'Z', 'A', 'D', 'R'});
 
             game->get_board().place(scrawble::board::size / 2, scrawble::board::size / 2, game->get_bag().next('W'));
 
@@ -108,11 +91,17 @@ go_bandit([]() {
 
             game->search(scrawble::board::size / 2, scrawble::board::size / 2, game->get_player().get_rack(), pool);
 
-            for (auto &m : pool) {
-                printf("[%d,%d] %s\n", m.get_point().x, m.get_point().y, m.get_word().c_str());
-            }
+            Assert::That(pool.size(), Equals(26));
 
-            Assert::That(pool.size(), Equals(3));
+            std::set<scrawble::lexicon::move, order_by_score> best_move;
+
+            best_move.insert(pool.begin(), pool.end());
+
+            auto best = *best_move.begin();
+
+            Assert::That(best.get_score(), Equals(6));
+
+            Assert::That(best.get_word(), Equals("FROW"));
         });
 
     });

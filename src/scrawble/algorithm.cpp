@@ -14,11 +14,12 @@ namespace scrawble
             std::string word;
             lexicon::node::ptr node;
             scrawble::rack rack;
+            int score;
 
             move(const lexicon::point start, const lexicon::point &actual, lexicon::direction::type dir,
                  const std::string &word, const lexicon::node::ptr &node, const scrawble::rack &rack);
 
-            move copy(char del) const;
+            move copy(const tile &tile) const;
 
             move turn(lexicon::direction::type dir) const;
 
@@ -27,15 +28,20 @@ namespace scrawble
 
         move::move(const lexicon::point start, const lexicon::point &actual, lexicon::direction::type dir,
                    const std::string &word, const lexicon::node::ptr &node, const scrawble::rack &rack)
-            : start(start), left(), actual(actual), direction(dir), word(word), node(node), rack(rack)
+            : start(start), left(), actual(actual), direction(dir), word(word), node(node), rack(rack), score(0)
         {
         }
 
-        move move::copy(char del) const
+        move move::copy(const tile &tile) const
         {
+            auto del = tile.letter();
             move tmp(*this);
-            tmp.rack[std::distance(tmp.rack.begin(), std::find(tmp.rack.begin(), tmp.rack.end(), del))] = tile();
+            auto it = std::find(tmp.rack.begin(), tmp.rack.end(), del);
+            assert(it != tmp.rack.end());
+            auto index = std::distance(tmp.rack.begin(), it);
+            tmp.rack.pop(index);
             tmp.node = this->node->find(del);
+            tmp.score += tile.score();
             assert(tmp.node != nullptr);
             switch (tmp.direction) {
                 case lexicon::direction::left:
@@ -71,7 +77,7 @@ namespace scrawble
 
         lexicon::move move::convert() const
         {
-            return lexicon::move(start, word, direction);
+            return lexicon::move(start, word, direction, score);
         }
     }
 
@@ -194,12 +200,12 @@ namespace scrawble
 
         if (!tile.empty()) {
             if (m.node->find(tile.letter())) {
-                search_recursive(pool, m.copy(tile.letter()));
+                search_recursive(pool, m.copy(tile));
             }
         } else {
             for (auto t : m.rack) {
                 if (m.node->find(t.letter())) {
-                    search_recursive(pool, m.copy(t.letter()));
+                    search_recursive(pool, m.copy(t));
                 }
             }
         }
@@ -299,10 +305,8 @@ namespace scrawble
                 else
                     x1++;
             }
-            if (x1 >= board::size)
-                return node->marker();
-            if (y1 >= board::size)
-                return node->marker();
+            if (x1 >= board::size) return node->marker();
+            if (y1 >= board::size) return node->marker();
         }
         return node->marker();
     }

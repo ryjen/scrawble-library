@@ -5,6 +5,7 @@
 #include <scrawble/bag.h>
 #include <scrawble/config.h>
 #include <scrawble/player.h>
+#include <random>
 #include <vector>
 
 namespace scrawble
@@ -12,6 +13,8 @@ namespace scrawble
     class game_logic : public algorithm
     {
        public:
+        static std::mt19937 random_generator;
+
         game_logic();
 
         player &get_player();
