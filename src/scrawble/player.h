@@ -22,16 +22,20 @@ namespace scrawble
 
         tile get(size_t index);
 
+        player& swap(size_t index1, size_t index2);
+
         player& shuffle();
 
-        const rack& get_rack() const;
+        const scrawble::rack& rack() const;
 
         player& clear();
 
         player& fill(bag& bag);
 
+        player& add_score(int score);
+
        private:
-        rack rack_;
+        scrawble::rack rack_;
         int score_;
         std::string name_;
         int id_;

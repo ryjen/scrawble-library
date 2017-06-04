@@ -21,6 +21,10 @@ namespace scrawble
             {
                 return x >= 0 && y >= 0;
             }
+            bool operator<(const struct __point &p) const
+            {
+                return x < p.x && y < p.y;
+            }
         } point;
 
         namespace direction
@@ -30,19 +34,10 @@ namespace scrawble
 
         class move
         {
-            typedef struct __data {
-                char c;
-                point p;
-                __data(char c, const point &p) : c(c), p(p)
-                {
-                }
-            } data;
-
-            point start_;
             std::string word_;
+            lexicon::point start_;
             int score_;
-            std::vector<data> placed_;
-            direction::type direction_;
+            lexicon::direction::type direction_;
 
            public:
             move(const point &start, const std::string &word, direction::type dir, int score)
@@ -50,28 +45,22 @@ namespace scrawble
             {
             }
 
-            move &push(const data &value)
-            {
-                placed_.push_back(value);
-                return *this;
-            }
-
             bool operator<(const move &other) const
             {
                 return word_ < other.word_;
             }
 
-            const std::string &get_word() const
+            const std::string &word() const
             {
                 return word_;
             }
 
-            const point &get_point() const
+            point start() const
             {
                 return start_;
             }
 
-            const int get_score() const
+            int score() const
             {
                 return score_;
             }

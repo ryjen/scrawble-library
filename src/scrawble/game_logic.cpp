@@ -7,29 +7,40 @@
 
 namespace scrawble
 {
-    std::mt19937 game_logic::random_generator;
+    namespace detail
+    {
+        std::random_device rd;
+    }
+    std::mt19937 game_logic::random_generator(detail::rd());
 
     game_logic::game_logic() : players_(max_players)
     {
     }
 
-    player &game_logic::get_player()
+    scrawble::player &game_logic::player()
     {
         return players_[this_player_index];
     }
 
-    board &game_logic::get_board()
+    const scrawble::player &game_logic::player() const
+    {
+        return players_[this_player_index];
+    }
+
+    scrawble::board &game_logic::board()
     {
         return board_;
     }
 
-    bag &game_logic::get_bag()
+    scrawble::bag &game_logic::bag()
     {
         return bag_;
     }
 
-    game_logic &game_logic::finish_turn()
+    game_logic &game_logic::finish_turn(int score)
     {
+        players_[turn_].add_score(score);
+
         if (++turn_ > players_.size()) {
             turn_ = 0;
         }
@@ -46,5 +57,20 @@ namespace scrawble
             }
         }
         return *this;
+    }
+
+    std::set<lexicon::move> game_logic::hints() const
+    {
+        std::set<lexicon::move> pool;
+
+        for (int x = 0; x < board::size; x++) {
+            for (int y = 0; y < board::size; y++) {
+                if (!board_[x][y].empty()) {
+                    search(x, y, player().rack(), pool);
+                }
+            }
+        }
+
+        return pool;
     }
 }

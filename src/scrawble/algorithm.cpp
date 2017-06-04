@@ -8,7 +8,6 @@ namespace scrawble
     {
         struct move {
             lexicon::point start;
-            lexicon::point left;
             lexicon::point actual;
             lexicon::direction::type direction;
             std::string word;
@@ -28,7 +27,7 @@ namespace scrawble
 
         move::move(const lexicon::point start, const lexicon::point &actual, lexicon::direction::type dir,
                    const std::string &word, const lexicon::node::ptr &node, const scrawble::rack &rack)
-            : start(start), left(), actual(actual), direction(dir), word(word), node(node), rack(rack), score(0)
+            : start(start), actual(actual), direction(dir), word(word), node(node), rack(rack), score(0)
         {
         }
 
@@ -86,7 +85,7 @@ namespace scrawble
         board_.init();
     }
 
-    void algorithm::search(int x, int y, const rack &rack, std::set<lexicon::move> &pool)
+    void algorithm::search(int x, int y, const rack &rack, std::set<lexicon::move> &pool) const
     {
         lexicon::node::ptr root;
 
@@ -118,7 +117,7 @@ namespace scrawble
     }
 
     void algorithm::recurse_left_right(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
-                                       const rack &rack)
+                                       const rack &rack) const
     {
         if (x < 0 || x >= board::size || y < 0 || y >= board::size) {
             return;
@@ -147,7 +146,7 @@ namespace scrawble
     }
 
     void algorithm::recurse_up_down(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
-                                    const rack &rack)
+                                    const rack &rack) const
     {
         if (x < 0 || x >= board::size || y < 0 || y >= board::size) {
             return;
@@ -174,7 +173,7 @@ namespace scrawble
         }
     }
 
-    void algorithm::search_recursive(std::set<lexicon::move> &pool, const temp::move &m)
+    void algorithm::search_recursive(std::set<lexicon::move> &pool, const temp::move &m) const
     {
         if (!cross(m, m.node->value())) {
             return;
@@ -288,10 +287,11 @@ namespace scrawble
 
             node = tmp;
 
-            if (down)
+            if (down) {
                 y1++;
-            else
+            } else {
                 x1++;
+            }
 
             if (x1 == x2 && y1 == y2) {
                 auto tmp = node->find(ch);
@@ -300,13 +300,18 @@ namespace scrawble
                 }
                 node = tmp;
 
-                if (down)
+                if (down) {
                     y1++;
-                else
+                } else {
                     x1++;
+                }
             }
-            if (x1 >= board::size) return node->marker();
-            if (y1 >= board::size) return node->marker();
+            if (x1 >= board::size) {
+                return node->marker();
+            }
+            if (y1 >= board::size) {
+                return node->marker();
+            }
         }
         return node->marker();
     }

@@ -17,19 +17,23 @@ namespace scrawble
 
         game_logic();
 
-        player &get_player();
+        scrawble::player &player();
 
-        board &get_board();
+        const scrawble::player &player() const;
 
-        game_logic &finish_turn();
+        scrawble::board &board();
 
-        bag &get_bag();
+        game_logic &finish_turn(int score);
+
+        std::set<lexicon::move> hints() const;
+
+        scrawble::bag &bag();
 
         game_logic &init(const config &conf);
 
        protected:
-        bag bag_;
-        std::vector<player> players_;
+        scrawble::bag bag_;
+        std::vector<scrawble::player> players_;
         int turn_;
 
        private:

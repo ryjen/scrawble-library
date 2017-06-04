@@ -21,7 +21,7 @@ namespace scrawble
        public:
         algorithm();
 
-        void search(int x, int y, const rack &rack, std::set<lexicon::move> &pool);
+        void search(int x, int y, const rack &rack, std::set<lexicon::move> &pool) const;
 
        protected:
         board board_;
@@ -34,11 +34,13 @@ namespace scrawble
 
         tile next_tile(const temp::move &m) const;
 
-        void recurse_left_right(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y, const rack &rack);
+        void recurse_left_right(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
+                                const rack &rack) const;
 
-        void recurse_up_down(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y, const rack &rack);
+        void recurse_up_down(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
+                             const rack &rack) const;
 
-        void search_recursive(std::set<lexicon::move> &pool, const temp::move &m);
+        void search_recursive(std::set<lexicon::move> &pool, const temp::move &m) const;
 
         bool cross(const temp::move &m, char ch) const;
 

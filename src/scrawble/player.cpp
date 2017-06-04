@@ -21,7 +21,7 @@ namespace scrawble
 
         auto existing = rack_[index];
 
-        rack_[index] = tile;
+        rack_.set(index, tile);
 
         return existing;
     }
@@ -40,9 +40,7 @@ namespace scrawble
         if (index >= rack::size) {
             throw std::out_of_range("invalid index for player pop");
         }
-        auto t = rack_[index];
-        rack_[index] = tile();
-        return t;
+        return rack_.pop(index);
     }
 
     tile player::get(size_t index)
@@ -51,6 +49,20 @@ namespace scrawble
             return tile();
         }
         return rack_[index];
+    }
+
+    player& player::swap(size_t index1, size_t index2)
+    {
+        if (index1 >= rack::size || index2 >= rack::size) {
+            throw std::out_of_range("invalid index to player swap");
+        }
+
+        auto tile1 = rack_.pop(index1);
+        auto tile2 = rack_.pop(index2);
+
+        rack_.set(index1, tile2);
+        rack_.set(index2, tile1);
+        return *this;
     }
 
     player& player::clear()
@@ -67,9 +79,15 @@ namespace scrawble
         return *this;
     }
 
-    const rack& player::get_rack() const
+    const scrawble::rack& player::rack() const
     {
         return rack_;
+    }
+
+    player& player::add_score(int score)
+    {
+        score_ += score;
+        return *this;
     }
 
     player& player::fill(bag& bag)

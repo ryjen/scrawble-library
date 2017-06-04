@@ -37,9 +37,7 @@ namespace scrawble
             if (index >= size) {
                 throw std::out_of_range("no more room in rack push");
             }
-            if (values_[index].empty()) {
-                values_[index] = value;
-            }
+            values_[index] = value;
             return *this;
         }
         tile pop(size_t index)

@@ -53,7 +53,7 @@ class test_game : public scrawble::game_logic
     void set_player_rack(const std::initializer_list<char> &list)
     {
         for (auto ch : list) {
-            get_player().push(get_bag().next(ch));
+            player().push(bag().next(ch));
         }
     }
 };
@@ -61,7 +61,7 @@ class test_game : public scrawble::game_logic
 struct order_by_score {
     bool operator()(const scrawble::lexicon::move &a, const scrawble::lexicon::move &b) const
     {
-        return a.get_score() > b.get_score();
+        return a.score() > b.score();
     }
 };
 
@@ -85,11 +85,11 @@ go_bandit([]() {
         it("can find the best move", [&game]() {
             game->set_player_rack({'C', 'O', 'F', 'Z', 'A', 'D', 'R'});
 
-            game->get_board().place(scrawble::board::size / 2, scrawble::board::size / 2, game->get_bag().next('W'));
+            game->board().place(scrawble::board::size / 2, scrawble::board::size / 2, game->bag().next('W'));
 
             std::set<scrawble::lexicon::move> pool;
 
-            game->search(scrawble::board::size / 2, scrawble::board::size / 2, game->get_player().get_rack(), pool);
+            game->search(scrawble::board::size / 2, scrawble::board::size / 2, game->player().rack(), pool);
 
             Assert::That(pool.size(), Equals(26));
 
@@ -99,9 +99,9 @@ go_bandit([]() {
 
             auto best = *best_move.begin();
 
-            Assert::That(best.get_score(), Equals(6));
+            Assert::That(best.score(), Equals(6));
 
-            Assert::That(best.get_word(), Equals("FROW"));
+            Assert::That(best.word(), Equals("FROW"));
         });
 
     });

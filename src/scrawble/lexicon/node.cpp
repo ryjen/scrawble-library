@@ -5,7 +5,7 @@ namespace scrawble
     namespace lexicon
     {
         const char node::BEGIN = '~';
-        const char node::EMPTY = '_';
+        const char node::EMPTY = ' ';
         const char node::DIRSYM = '<';
 
         node::iterator node::begin()
