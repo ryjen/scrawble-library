@@ -76,7 +76,7 @@ namespace scrawble
 
         lexicon::move move::convert() const
         {
-            return lexicon::move(start, word, direction, score);
+            return lexicon::move(start, word, score);
         }
     }
 

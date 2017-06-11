@@ -37,11 +37,10 @@ namespace scrawble
             std::string word_;
             lexicon::point start_;
             int score_;
-            lexicon::direction::type direction_;
 
            public:
-            move(const point &start, const std::string &word, direction::type dir, int score)
-                : start_(start), word_(word), score_(score), direction_(dir)
+            move(const point &start, const std::string &word, int score)
+                : word_(word), start_(start), score_(score)
             {
             }
 

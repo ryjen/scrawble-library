@@ -25,10 +25,10 @@ namespace scrawble
             return children_.end();
         }
 
-        node::node() : value_()
+        node::node() : value_(), marker_(false)
         {
         }
-        node::node(char value) : value_(value)
+        node::node(char value) : value_(value), marker_(false)
         {
         }
 

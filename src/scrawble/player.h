@@ -38,7 +38,6 @@ namespace scrawble
         scrawble::rack rack_;
         int score_;
         std::string name_;
-        int id_;
     };
 
     class opponent : public player
