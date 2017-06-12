@@ -1,9 +1,9 @@
 #ifndef SCRAWBLE_RACK_H
 #define SCRAWBLE_RACK_H
 
+#include <scrawble/bag.h>
 #include <scrawble/tile.h>
 #include <array>
-#include <stdexcept>
 
 namespace scrawble
 {
@@ -14,62 +14,24 @@ namespace scrawble
         typedef std::array<tile, size>::iterator iterator;
         typedef std::array<tile, size>::const_iterator const_iterator;
 
-        tile operator[](size_t index) const
-        {
-            if (index < size) {
-                return values_[index];
-            }
-            throw std::out_of_range("invalid index for rack");
-        }
+        tile operator[](size_t index) const;
 
-        rack &push(const tile &value)
-        {
-            for (int i = 0; i < size; i++) {
-                if (values_[i].empty()) {
-                    values_[i] = value;
-                    return *this;
-                }
-            }
-            throw std::out_of_range("no more room in rack push");
-        }
-        rack &set(size_t index, const tile &value)
-        {
-            if (index >= size) {
-                throw std::out_of_range("no more room in rack push");
-            }
-            values_[index] = value;
-            return *this;
-        }
-        tile pop(size_t index)
-        {
-            if (index >= size) {
-                throw std::out_of_range("invalid index for rack pop");
-            }
+        tile at(size_t index) const;
+        rack& push(const tile& value);
+        rack& set(size_t index, const tile& value);
+        tile pop(size_t index);
+        rack& clear();
+        rack& shuffle();
+        rack& fill(bag& bag);
+        rack& pop(const tile& t);
+        tile replace(size_t index, const tile& tile);
+        rack& swap(size_t index1, size_t index2);
+        iterator begin();
+        const_iterator begin() const;
+        iterator end();
+        const_iterator end() const;
 
-            tile value = values_[index];
-            values_[index] = tile();
-            return value;
-        }
-
-        iterator begin()
-        {
-            return values_.begin();
-        }
-
-        const_iterator begin() const
-        {
-            return values_.begin();
-        }
-
-        iterator end()
-        {
-            return values_.end();
-        }
-
-        const_iterator end() const
-        {
-            return values_.end();
-        }
+        std::string to_string() const;
 
        private:
         std::array<tile, size> values_;

@@ -58,19 +58,4 @@ namespace scrawble
         }
         return *this;
     }
-
-    std::set<lexicon::move> game_logic::hints() const
-    {
-        std::set<lexicon::move> pool;
-
-        for (int x = 0; x < board::size; x++) {
-            for (int y = 0; y < board::size; y++) {
-                if (!board_[x][y].empty()) {
-                    search(x, y, player().rack(), pool);
-                }
-            }
-        }
-
-        return pool;
-    }
 }

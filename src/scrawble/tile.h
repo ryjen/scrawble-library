@@ -8,27 +8,31 @@ namespace scrawble
     class tile
     {
        public:
+        typedef char value_type;
+
+        static const value_type EMPTY;
+
         tile();
 
-        tile(const char &letter, int score);
+        tile(const value_type &letter, int score);
 
         bool empty() const;
 
         int score() const;
 
-        char letter() const;
+        value_type letter() const;
 
         bool operator<(const tile &other) const;
 
         bool operator==(const tile &other) const;
 
-        bool operator<(const char &letter) const;
+        bool operator<(const value_type &letter) const;
 
-        bool operator==(const char &letter) const;
+        bool operator==(const value_type &letter) const;
 
        private:
         int score_;
-        char letter_;
+        value_type letter_;
     };
 }
 

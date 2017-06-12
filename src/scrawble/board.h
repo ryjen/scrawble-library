@@ -16,7 +16,13 @@ namespace scrawble
 
         board();
 
-        board &init();
+        board(const board &other);
+        board(board &&other);
+
+        board &operator=(const board &other);
+        board &operator=(board &&other);
+
+        virtual ~board();
 
         tile &value(int x, int y);
 
@@ -42,6 +48,8 @@ namespace scrawble
         row operator[](int index) const;
 
        private:
+        void init();
+        void copy(const board &from);
         tile values_[size][size];
         short wordBonus_[size][size];
         short letterBonus_[size][size];

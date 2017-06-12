@@ -1,7 +1,6 @@
 #ifndef SCRAWBLE_PLAYER_H
 #define SCRAWBLE_PLAYER_H
 
-#include <scrawble/bag.h>
 #include <scrawble/rack.h>
 #include <scrawble/tile.h>
 #include <string>
@@ -12,27 +11,17 @@ namespace scrawble
     class player
     {
        public:
-        player& push(const tile& tile);
+        player();
 
-        tile replace(size_t index, const tile& tile);
+        const scrawble::rack &rack() const;
 
-        player& pop(const tile& tile);
+        scrawble::rack &rack();
 
-        tile pop(size_t index);
+        player &add_score(int score);
 
-        tile get(size_t index);
+        const std::string &name() const;
 
-        player& swap(size_t index1, size_t index2);
-
-        player& shuffle();
-
-        const scrawble::rack& rack() const;
-
-        player& clear();
-
-        player& fill(bag& bag);
-
-        player& add_score(int score);
+        const int score() const;
 
        private:
         scrawble::rack rack_;

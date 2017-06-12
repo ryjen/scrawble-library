@@ -15,8 +15,8 @@ namespace scrawble
             scrawble::rack rack;
             int score;
 
-            move(const lexicon::point start, const lexicon::point &actual, lexicon::direction::type dir,
-                 const std::string &word, const lexicon::node::ptr &node, const scrawble::rack &rack);
+            move(const lexicon::point &start, const lexicon::point &actual, const lexicon::direction::type &dir,
+                 const std::string &word, const lexicon::node::ptr &node, scrawble::rack &rack);
 
             move copy(const tile &tile) const;
 
@@ -25,8 +25,8 @@ namespace scrawble
             lexicon::move convert() const;
         };
 
-        move::move(const lexicon::point start, const lexicon::point &actual, lexicon::direction::type dir,
-                   const std::string &word, const lexicon::node::ptr &node, const scrawble::rack &rack)
+        move::move(const lexicon::point &start, const lexicon::point &actual, const lexicon::direction::type &dir,
+                   const std::string &word, const lexicon::node::ptr &node, scrawble::rack &rack)
             : start(start), actual(actual), direction(dir), word(word), node(node), rack(rack), score(0)
         {
         }
@@ -85,7 +85,7 @@ namespace scrawble
         board_.init();
     }
 
-    void algorithm::search(int x, int y, const rack &rack, std::set<lexicon::move> &pool) const
+    void algorithm::search(int x, int y, scrawble::rack rack, std::set<lexicon::move> &pool) const
     {
         lexicon::node::ptr root;
 
@@ -102,6 +102,7 @@ namespace scrawble
                 }
             }
         } catch (const std::out_of_range &e) {
+            std::cerr << "no left right move for " << x << ":" << y << std::endl;
         }
 
         try {
@@ -113,11 +114,12 @@ namespace scrawble
                 }
             }
         } catch (const std::out_of_range &e) {
+            std::cerr << "no up down move for " << x << ":" << y << std::endl;
         }
     }
 
-    void algorithm::recurse_left_right(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
-                                       const rack &rack) const
+    void algorithm::recurse_left_right(std::set<lexicon::move> &pool, lexicon::node::ptr &root, int x, int y,
+                                       scrawble::rack &rack) const
     {
         if (x < 0 || x >= board::size || y < 0 || y >= board::size) {
             return;
@@ -142,11 +144,12 @@ namespace scrawble
 
             search_recursive(pool, tmp);
         } catch (const std::out_of_range &e) {
+            std::cerr << "no left right move for " << x << ":" << y << ":" << root->value() << std::endl;
         }
     }
 
-    void algorithm::recurse_up_down(std::set<lexicon::move> &pool, lexicon::node::ptr root, int x, int y,
-                                    const rack &rack) const
+    void algorithm::recurse_up_down(std::set<lexicon::move> &pool, lexicon::node::ptr &root, int x, int y,
+                                    scrawble::rack &rack) const
     {
         if (x < 0 || x >= board::size || y < 0 || y >= board::size) {
             return;
@@ -170,6 +173,7 @@ namespace scrawble
 
             search_recursive(pool, tmp);
         } catch (const std::out_of_range &e) {
+            std::cerr << "no up down move for " << x << ":" << y << ":" << root->value() << std::endl;
         }
     }
 
@@ -203,7 +207,7 @@ namespace scrawble
             }
         } else {
             for (auto t : m.rack) {
-                if (m.node->find(t.letter())) {
+                if (!t.empty() && m.node->find(t.letter())) {
                     search_recursive(pool, m.copy(t));
                 }
             }
@@ -314,5 +318,20 @@ namespace scrawble
             }
         }
         return node->marker();
+    }
+
+    std::set<lexicon::move> algorithm::hints() const
+    {
+        std::set<lexicon::move> pool;
+
+        for (int x = 0; x < board::size; x++) {
+            for (int y = 0; y < board::size; y++) {
+                if (!board_[x][y].empty()) {
+                    search(x, y, player().rack(), pool);
+                }
+            }
+        }
+
+        return pool;
     }
 }
