@@ -16,16 +16,38 @@ namespace scrawble
     {
         return values_ < other.values_;
     }
+    
+    path::path(const value_type &value) : values_({value})
+    {}
 
     path::path(const value_list &values) : values_(values)
     {
     }
 
-    path::path(const value_list &values, const path &other) : values_(values)
+    path::path(const value_list &values, const path::ptr &other) : values_(values)
     {
-        values_.insert(values_.end(), other.values_.begin(), other.values_.end());
+        values_.insert(values_.end(), other->values_.begin(), other->values_.end());
     }
 
+    
+    path::path(const path &other) : values_(other.values_)
+    {}
+    
+    path::path(path &&other) : values_(std::move(other.values_))
+    {}
+    
+    path::~path() {}
+    
+    path &path::operator=(const path &other) {
+        values_ = other.values_;
+        return *this;
+    }
+    
+    path &path::operator=(path &&other) {
+        values_ = std::move(other.values_);
+        return *this;
+    }
+    
     path::value_list path::reverse_prefix_values() const
     {
         auto it = std::find(values_.begin(), values_.end(), path::DELIMITER);

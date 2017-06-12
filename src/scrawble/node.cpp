@@ -3,23 +3,42 @@
 #include <scrawble/path.h>
 #include <scrawble/util.h>
 #include <algorithm>
+#include <memory>
 #include <cassert>
 
 namespace scrawble
 {
+    node::node() : arcs_() {}
+    
+    node::node(const node &other) : arcs_(other.arcs_) {}
+    
+    node::node(node &&other) : arcs_(std::move(other.arcs_)) {}
+    
+    node::~node() {}
+    
+    node &node::operator=(const node &other) {
+        arcs_ = other.arcs_;
+        return *this;
+    }
+    
+    node &node::operator=(node &&other) {
+        arcs_ = std::move(other.arcs_);
+        return *this;
+    }
+    
     bool node::operator==(const node &other) const
     {
         return std::equal(arcs_.begin(), arcs_.end(), other.arcs_.begin());
     }
 
-    arc node::create_arc(const value_type &value, const node &destination)
+    node::arc_ptr node::create_arc(const value_type &value, const destination_type &destination)
     {
         auto it = arcs_.find(value);
         if (it != arcs_.end()) {
             return it->second;
         }
 
-        scrawble::arc arc(destination);
+        arc_ptr arc = std::make_shared<scrawble::arc>(destination);
 
         arcs_.emplace(value, arc);
         return arc;
@@ -30,22 +49,22 @@ namespace scrawble
         return arcs_.count(value) > 0;
     }
 
-    arc node::create_final_arc(const value_type &value, const value_type &final, const node &destination)
+    node::arc_ptr node::create_final_arc(const value_type &value, const value_type &final, const destination_type &destination)
     {
-        scrawble::arc arc = create_arc(value, destination);
+        auto arc = create_arc(value, destination);
 
-        arc.push_final_value(final);
+        arc->push_final_value(final);
 
         return arc;
     }
 
     node::destination_type node::create_path(const value_list &values, const destination_list &destinations)
     {
-        auto zipped = zip(values, destinations);
+        zip_type<value_type, destination_type> zipped = zip(values, destinations);
         return reduce<destination_type, zip_item<value_type, destination_type>>(
-            *this, zipped, [&](destination_type &memo, const zip_item<value_type, destination_type> &value) {
-                return memo.create_arc(value.first, value.second).destination();
-            });
+            shared_from_this(), zipped, [](destination_type &memo, const zip_item<value_type, destination_type> &value) {
+                return memo->create_arc(value.first, value.second)->destination();
+        });
     }
 
     bool node::is_path(const value_list &values) const
@@ -60,21 +79,26 @@ namespace scrawble
             return false;
         }
 
-        return follow_arc(*first).is_path({values.back()});
+        return follow_arc(*first)->is_path({values.back()});
     }
 
     std::tuple<node::value_list, node::value_type, node::value_type> node::chop_last_pair(const value_list &values)
     {
-        assert(values.size() >= 2);
-        value_list initial_values(values);
-
-        value_type last_value = initial_values.back();
-        initial_values.pop_back();
-
-        value_type second_last_value = initial_values.back();
-        initial_values.pop_back();
-
-        return std::make_tuple(initial_values, second_last_value, last_value);
+        auto it = values.rbegin();
+        
+        if (it == values.rend()) {
+            return std::make_tuple(value_list(values.begin(), it.base()), value_type(), value_type());
+        }
+        
+        auto last_value = *it++;
+        
+        if (it == values.rend()) {
+            return std::make_tuple(value_list(values.begin(), it.base()), value_type(), last_value);
+        }
+        
+        auto second_last = *it++;
+        
+        return std::make_tuple(value_list(values.begin(), it.base()), second_last, last_value);
     }
 
     node::destination_type node::create_final_path(const value_list &values, const destination_list &destinations)
@@ -91,9 +115,9 @@ namespace scrawble
             final_destination = destinations[remaining.size()];
         }
 
-        second_last_node.create_final_arc(std::get<1>(tuple), std::get<2>(tuple), final_destination);
+        second_last_node->create_final_arc(std::get<1>(tuple), std::get<2>(tuple), final_destination);
 
-        return final_destination;
+        return second_last_node;
     }
 
     bool node::is_final_path(const value_list &values) const
@@ -108,12 +132,12 @@ namespace scrawble
 
         path final_path({std::get<1>(tuple), std::get<2>(tuple)});
 
-        auto final_paths = follow_path(remaining).final_paths();
+        auto final_paths = follow_path(remaining)->final_paths();
 
         return std::find(final_paths.begin(), final_paths.end(), final_path) != final_paths.end();
     }
 
-    const node &node::follow_arc(const value_type &value) const
+    const node::ptr &node::follow_arc(const value_type &value) const
     {
         auto it = arcs_.find(value);
 
@@ -121,26 +145,26 @@ namespace scrawble
             throw std::out_of_range("value not found");
         }
 
-        return it->second.destination();
+        return it->second->destination();
     }
 
-    const scrawble::node &node::follow_path(const value_list &values) const
+    const node::const_ptr &node::follow_path(const value_list &values) const
     {
         if (values.empty()) {
-            return *this;
+            return shared_from_this();
         }
-        return follow_arc(values.front()).follow_path({values.back()});
+        return follow_arc(values.front())->follow_path({values.back()});
     }
 
-    std::vector<path> node::final_paths() const
+    std::vector<path::ptr> node::final_paths() const
     {
-        std::vector<path> result;
+        std::vector<path::ptr> result;
 
         for (auto &pair : arcs_) {
             value_list path;
             path.push_back(pair.first);
-            for (auto &p1 : pair.second.final_paths()) {
-                for (auto &p2 : p1.to_array()) {
+            for (auto &p1 : pair.second->final_paths()) {
+                for (auto &p2 : p1->to_array()) {
                     path.push_back(p2);
                 }
             }

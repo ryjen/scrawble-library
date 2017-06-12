@@ -12,12 +12,24 @@ namespace scrawble
        public:
         typedef char value_type;
         typedef std::vector<value_type> value_list;
+        typedef std::shared_ptr<path> ptr;
 
         static const value_type DELIMITER;
+        
+        path(const value_type &value);
 
         path(const value_list &values);
 
-        path(const value_list &value, const path &other);
+        path(const value_list &value, const path::ptr &other);
+        
+        path(const path &other);
+        
+        path(path &&other);
+        
+        virtual ~path();
+        
+        path &operator=(const path &other);
+        path &operator=(path &&other);
 
         value_list reverse_prefix_values() const;
 
