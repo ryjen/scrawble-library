@@ -14,9 +14,16 @@ namespace scrawble
        public:
         typedef char value_type;
         typedef std::vector<value_type> value_list;
+        typedef std::shared_ptr<word> ptr;
 
         word(const value_list &values);
         word(const std::string &value);
+        
+        word(const word &other);
+        word(word &&other);
+        virtual ~word();
+        word &operator=(const word &other);
+        word &operator=(word &&other);
 
         std::string to_string() const;
 

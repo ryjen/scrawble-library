@@ -10,6 +10,13 @@ namespace scrawble
     class gaddag
     {
        public:
+        gaddag();
+        gaddag(const gaddag &other);
+        gaddag(gaddag &&other);
+        virtual ~gaddag();
+        gaddag &operator=(const gaddag &other);
+        gaddag &operator=(gaddag &&other);
+        
         gaddag &push(const std::string &word);
 
         std::set<std::string> find(const std::string &substr) const;
@@ -18,7 +25,7 @@ namespace scrawble
         typedef char value_type;
         typedef std::vector<value_type> value_list;
 
-        node root_;
+        node::ptr root_;
     };
 }
 
