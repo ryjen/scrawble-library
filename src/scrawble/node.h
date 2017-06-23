@@ -6,33 +6,22 @@
 
 namespace scrawble
 {
-    class arc;
     class path;
-    
-    class node : std::enable_shared_from_this<node>
+    class arc;
+
+    class node
     {
        public:
         typedef char value_type;
-        typedef std::shared_ptr<node> ptr;
-        typedef std::shared_ptr<const node> const_ptr;
-        typedef ptr destination_type;
+        typedef node destination_type;
         typedef std::vector<value_type> value_list;
-        typedef std::vector<destination_type> destination_list;
-        typedef std::shared_ptr<arc> arc_ptr;
-        typedef std::shared_ptr<path> path_ptr;
-        
-        node();
-        node(const node &other);
-        node(node &&other);
-        virtual ~node();
-        node &operator=(const node &other);
-        node &operator=(node &&other);
+        typedef std::vector<node> destination_list;
 
         bool operator==(const node &other) const;
 
-        arc_ptr create_arc(const value_type &value, const destination_type &destination = destination_type());
+        arc create_arc(const value_type &value, const destination_type &destination = node());
 
-        arc_ptr create_final_arc(const value_type &value, const value_type &final,
+        arc create_final_arc(const value_type &value, const value_type &final,
                              const destination_type &destination = destination_type());
 
         destination_type create_path(const value_list &values,
@@ -47,16 +36,16 @@ namespace scrawble
 
         bool is_final_path(const value_list &values) const;
 
-        const const_ptr &follow_arc(const value_type &value) const;
+        const node &follow_arc(const value_type &value) const;
 
-        const const_ptr &follow_path(const value_list &values) const;
+        const node &follow_path(const value_list &values) const;
 
-        std::vector<path_ptr> final_paths() const;
+        std::vector<path> final_paths() const;
 
        private:
         static std::tuple<value_list, value_type, value_type> chop_last_pair(const value_list &values);
 
-        std::map<value_type, arc_ptr> arcs_;
+        std::map<value_type, arc> arcs_;
     };
 }
 
