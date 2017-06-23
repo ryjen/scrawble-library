@@ -5,18 +5,24 @@
 
 namespace scrawble
 {
-    bag &bag::push(const tile &tile)
+    Bag &Bag::push(const Tile &tile)
     {
         letters_.push_back(tile);
         return *this;
     }
 
-    bool bag::empty() const
+    Bag &Bag::push(const Tile::value_type &letter, int score)
+    {
+        letters_.emplace_back(letter, score);
+        return *this;
+    }
+
+    bool Bag::empty() const
     {
         return letters_.empty();
     }
 
-    tile bag::next()
+    Tile Bag::next()
     {
         if (letters_.empty()) {
             throw std::out_of_range("No more letters");
@@ -24,19 +30,22 @@ namespace scrawble
 
         std::uniform_int_distribution<> dis(0, letters_.size() - 1);
 
-        auto index = dis(game_logic::random_generator);
+        auto index = dis(GameLogic::random_generator);
 
         if (index < 0 || index >= letters_.size()) {
             throw std::out_of_range("invalid generated index");
         }
 
         auto it = letters_.begin() + index;
+
         auto value = *it;
+
         letters_.erase(it);
+
         return value;
     }
 
-    tile bag::next(char letter)
+    Tile Bag::next(char letter)
     {
         if (letters_.empty()) {
             throw std::out_of_range("No more letters");
@@ -47,8 +56,11 @@ namespace scrawble
         if (it == std::end(letters_)) {
             throw std::out_of_range("invalid generated index");
         }
+
         auto value = *it;
+
         letters_.erase(it);
+
         return value;
     }
 }

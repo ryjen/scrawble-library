@@ -18,21 +18,29 @@ namespace scrawble
     {
     }
 
-    word::word(const word &other) : values_(other.values_) {
-        
+    word::word(const word &other) : values_(other.values_)
+    {
     }
-    word::word(word &&other) : values_(std::move(other.values_)) {}
-    
-    word::~word() {}
-    word &word::operator=(const word &other) {
+    word::word(word &&other) : values_(std::move(other.values_))
+    {
+    }
+
+    word::~word()
+    {
+    }
+
+    word &word::operator=(const word &other)
+    {
         values_ = other.values_;
         return *this;
     }
-    word &word::operator=(word &&other) {
+
+    word &word::operator=(word &&other)
+    {
         values_ = std::move(other.values_);
         return *this;
     }
-    
+
     std::string word::to_string() const
     {
         return std::string(values_.begin(), values_.end());

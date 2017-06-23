@@ -6,28 +6,28 @@
 
 namespace scrawble
 {
-    class config
+    class Config
     {
        public:
-        config();
+        Config();
 
-        typedef struct tile {
+        typedef struct Tile {
             int score;
             int count;
             char letter;
-            tile(int score, int count, char letter) : score(score), count(count), letter(letter)
+            Tile(int score, int count, char letter) : score(score), count(count), letter(letter)
             {
             }
-        } tile;
+        } Tile;
 
-        const std::vector<tile> &tile_distributions() const;
+        const std::vector<Tile> &tile_distributions() const;
 
         const std::string &dictionary_file_name() const;
 
         virtual void load(const std::string &filename) = 0;
 
        protected:
-        std::vector<tile> letters_;
+        std::vector<Tile> letters_;
         std::string dictionary_;
     };
 }

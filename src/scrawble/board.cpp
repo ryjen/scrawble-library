@@ -3,38 +3,38 @@
 
 namespace scrawble
 {
-    board::board()
+    Board::Board()
     {
         init();
     }
 
-    board::board(const board& other)
+    Board::Board(const Board& other)
     {
         copy(other);
     }
 
-    board::board(board&& other)
+    Board::Board(Board&& other)
     {
         copy(other);
     }
 
-    board::~board()
+    Board::~Board()
     {
     }
 
-    board& board::operator=(const board& other)
-    {
-        copy(other);
-        return *this;
-    }
-
-    board& board::operator=(board&& other)
+    Board& Board::operator=(const Board& other)
     {
         copy(other);
         return *this;
     }
 
-    void board::copy(const board& other)
+    Board& Board::operator=(Board&& other)
+    {
+        copy(other);
+        return *this;
+    }
+
+    void Board::copy(const Board& other)
     {
         for (int j = 0; j < size; j++) {
             for (int i = 0; i < size; i++) {
@@ -45,11 +45,11 @@ namespace scrawble
         }
     }
 
-    void board::init()
+    void Board::init()
     {
         for (int j = 0; j < size; j++) {
             for (int i = 0; i < size; i++) {
-                values_[i][j] = tile();
+                values_[i][j] = Tile();
                 wordBonus_[i][j] = 1;
                 letterBonus_[i][j] = 1;
             }
@@ -85,41 +85,41 @@ namespace scrawble
         loader(letterBonus_, doubleCh.begin(), doubleCh.end(), 2);
     }
 
-    tile& board::value(int x, int y)
+    Tile& Board::value(int x, int y)
     {
         return values_[x][y];
     }
 
-    short board::bonus(int x, int y, bool word)
+    short Board::bonus(int x, int y, bool word)
     {
         return word ? wordBonus_[x][y] : letterBonus_[x][y];
     }
 
-    board::row board::operator[](int index) const
+    Board::Row Board::operator[](int index) const
     {
         if (index < 0 || index >= size) {
             throw std::out_of_range("invalid index for board");
         }
-        tile const* row_values = values_[index];
+        Tile const* row_values = values_[index];
 
-        return board::row(row_values);
+        return Board::Row(row_values);
     }
 
-    board::row::row(tile const value[size])
+    Board::Row::Row(Tile const value[size])
     {
         for (int i = 0; i < size; i++) {
             values_[i] = value[i];
         }
     }
 
-    board::row::row(const row& other)
+    Board::Row::Row(const Row& other)
     {
         for (int i = 0; i < size; i++) {
             values_[i] = other.values_[i];
         }
     }
 
-    tile board::row::operator[](int index) const
+    Tile Board::Row::operator[](int index) const
     {
         if (index < 0 || index >= size) {
             throw std::out_of_range("invalid index for board row");
@@ -127,7 +127,7 @@ namespace scrawble
         return values_[index];
     }
 
-    tile board::place(int x, int y, const tile& value)
+    Tile Board::place(int x, int y, const Tile& value)
     {
         if (x < 0 || x >= size || y < 0 || y >= size) {
             throw std::out_of_range("invalid index for board place");
@@ -140,13 +140,13 @@ namespace scrawble
         return existing;
     }
 
-    board& board::reset(int x, int y)
+    Board& Board::reset(int x, int y)
     {
         if (x < 0 || x >= size || y < 0 || y >= size) {
             throw std::out_of_range("invalid index for board place");
         }
 
-        values_[x][y] = tile();
+        values_[x][y] = Tile();
         return *this;
     }
 }

@@ -4,23 +4,35 @@
 
 namespace scrawble
 {
-    gaddag::gaddag() {}
-    
-    gaddag::gaddag(const gaddag &other) : root_(other.root_) {}
-    
-    gaddag::gaddag(gaddag &&other) : root_(std::move(other.root_)) {}
-    
-    gaddag::~gaddag() {}
-    
-    gaddag &gaddag::operator=(const gaddag &other) {
+    gaddag::gaddag() : root_(std::make_shared<node>())
+    {
+    }
+
+    gaddag::gaddag(const gaddag &other) : root_(other.root_)
+    {
+    }
+
+    gaddag::gaddag(gaddag &&other) : root_(std::move(other.root_))
+    {
+        other.root_ = nullptr;
+    }
+
+    gaddag::~gaddag()
+    {
+    }
+
+    gaddag &gaddag::operator=(const gaddag &other)
+    {
         root_ = other.root_;
         return *this;
     }
-    gaddag &gaddag::operator=(gaddag &&other) {
+    gaddag &gaddag::operator=(gaddag &&other)
+    {
         root_ = std::move(other.root_);
+        other.root_ = nullptr;
         return *this;
     }
-    
+
     gaddag &gaddag::push(const std::string &value)
     {
         value_list reversed(value.rbegin(), value.rend());
@@ -42,7 +54,7 @@ namespace scrawble
         if (substr.length() < 2) {
             return {};
         }
-        
+
         value_list params(substr.begin(), substr.begin() + 2);
 
         value_list last_values(substr.begin() + 2, substr.end());

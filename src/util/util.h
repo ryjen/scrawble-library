@@ -56,7 +56,7 @@ namespace scrawble
     template <typename P1, typename P2>
     zip_type<P1, P2> zip(const std::vector<P1> &v1, const std::vector<P2> &v2)
     {
-        std::vector<std::pair<P1, P2>> result(v1.size());
+        zip_type<P1, P2> result(v1.size());
 
         auto it = v2.begin();
 
@@ -71,6 +71,9 @@ namespace scrawble
         return result;
     }
 
+    template <typename P1, typename P2>
+    using reduce_callback = std::function<P1(const P1 &, const P2 &)>;
+
     /**
      * reduces a vector by accumulation into a new value
      * @param initial the starting value for accumulation
@@ -79,17 +82,17 @@ namespace scrawble
      * @return the reduced value
      */
     template <typename P1, typename P2>
-    P1 reduce(P1 &initial, const std::vector<P2> &values, const std::function<P1(P1 &, const P2 &)> &accumulator)
+    P1 reduce(const P1 &initial, const std::vector<P2> &values, const reduce_callback<P1, P2> &accumulator)
     {
         auto it = values.begin();
-        
+
         if (it == values.end()) {
             return initial;
         }
-        
+
         P1 current = accumulator(initial, *it);
 
-        while(++it != values.end()) {
+        while (++it != values.end()) {
             current = accumulator(current, *it);
         }
 
@@ -118,20 +121,19 @@ namespace scrawble
         }
         return result;
     }
-    
-    
-    template<typename P1>
+
+    template <typename P1>
     using split_type = std::pair<P1, P1>;
-    
-    template<typename P1>
+
+    template <typename P1>
     split_type<std::vector<P1>> split(const std::vector<P1> &values, int count)
     {
         assert(values.size() >= count);
-        
+
         std::vector<P1> v1(values.begin(), values.begin() + count);
-        
+
         std::vector<P1> v2(values.begin() + count, values.end());
-        
+
         return {v1, v2};
     }
 }

@@ -7,25 +7,25 @@
 
 namespace scrawble
 {
-    class rack
+    class Rack
     {
        public:
         static const int size = 7;
-        typedef std::array<tile, size>::iterator iterator;
-        typedef std::array<tile, size>::const_iterator const_iterator;
+        typedef std::array<Tile, size>::iterator iterator;
+        typedef std::array<Tile, size>::const_iterator const_iterator;
 
-        tile operator[](size_t index) const;
+        Tile operator[](size_t index) const;
 
-        tile at(size_t index) const;
-        rack& push(const tile& value);
-        rack& set(size_t index, const tile& value);
-        tile pop(size_t index);
-        rack& clear();
-        rack& shuffle();
-        rack& fill(bag& bag);
-        rack& pop(const tile& t);
-        tile replace(size_t index, const tile& tile);
-        rack& swap(size_t index1, size_t index2);
+        Tile at(size_t index) const;
+        Rack& push(const Tile& value);
+        Rack& set(size_t index, const Tile& value);
+        Tile pop(size_t index);
+        Rack& clear();
+        Rack& shuffle();
+        Rack& fill(Bag& bag);
+        Rack& pop(const Tile& t);
+        Tile replace(size_t index, const Tile& tile);
+        Rack& swap(size_t index1, size_t index2);
         iterator begin();
         const_iterator begin() const;
         iterator end();
@@ -34,7 +34,7 @@ namespace scrawble
         std::string to_string() const;
 
        private:
-        std::array<tile, size> values_;
+        std::array<Tile, size> values_;
     };
 }
 

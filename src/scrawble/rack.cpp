@@ -4,19 +4,19 @@
 
 namespace scrawble
 {
-    tile rack::operator[](size_t index) const
+    Tile Rack::operator[](size_t index) const
     {
         return at(index);
     }
 
-    tile rack::at(size_t index) const
+    Tile Rack::at(size_t index) const
     {
         if (index < size) {
             return values_[index];
         }
         throw std::out_of_range("invalid index for rack");
     }
-    rack& rack::push(const tile& value)
+    Rack& Rack::push(const Tile& value)
     {
         for (int i = 0; i < size; i++) {
             if (values_[i].empty()) {
@@ -26,7 +26,7 @@ namespace scrawble
         }
         throw std::out_of_range("no more room in rack push");
     }
-    rack& rack::set(size_t index, const tile& value)
+    Rack& Rack::set(size_t index, const Tile& value)
     {
         if (index >= size) {
             throw std::out_of_range("no more room in rack push");
@@ -34,36 +34,34 @@ namespace scrawble
         values_[index] = value;
         return *this;
     }
-    tile rack::pop(size_t index)
+    Tile Rack::pop(size_t index)
     {
         if (index >= size) {
             throw std::out_of_range("invalid index for rack pop");
         }
 
-        tile value = values_[index];
-        values_[index] = tile();
+        Tile value = values_[index];
+        values_[index] = Tile();
         return value;
     }
 
-
-    rack& rack::clear()
+    Rack& Rack::clear()
     {
-        for (int i = 0; i < rack::size; i++) {
-            values_[i] = tile();
+        for (int i = 0; i < Rack::size; i++) {
+            values_[i] = Tile();
         }
         return *this;
     }
 
-    rack& rack::shuffle()
+    Rack& Rack::shuffle()
     {
-        std::shuffle(begin(), end(), game_logic::random_generator);
+        std::shuffle(begin(), end(), GameLogic::random_generator);
         return *this;
     }
 
-
-    rack& rack::fill(bag& bag)
+    Rack& Rack::fill(Bag& bag)
     {
-        for (int i = 0; i < rack::size; i++) {
+        for (int i = 0; i < Rack::size; i++) {
             if (values_[i].empty()) {
                 values_[i] = bag.next();
             }
@@ -71,18 +69,18 @@ namespace scrawble
         return *this;
     }
 
-    rack& rack::pop(const tile& t)
+    Rack& Rack::pop(const Tile& t)
     {
         auto it = std::find(begin(), end(), t);
         if (it != end()) {
-            *it = tile();
+            *it = Tile();
         }
         return *this;
     }
 
-    tile rack::replace(size_t index, const tile& tile)
+    Tile Rack::replace(size_t index, const Tile& tile)
     {
-        if (index >= rack::size) {
+        if (index >= Rack::size) {
             throw std::out_of_range("invalid index for player replace");
         }
 
@@ -93,9 +91,9 @@ namespace scrawble
         return existing;
     }
 
-    rack& rack::swap(size_t index1, size_t index2)
+    Rack& Rack::swap(size_t index1, size_t index2)
     {
-        if (index1 >= rack::size || index2 >= rack::size) {
+        if (index1 >= Rack::size || index2 >= Rack::size) {
             throw std::out_of_range("invalid index to player swap");
         }
 
@@ -107,31 +105,31 @@ namespace scrawble
         return *this;
     }
 
-    rack::iterator rack::begin()
+    Rack::iterator Rack::begin()
     {
         return values_.begin();
     }
 
-    rack::const_iterator rack::begin() const
+    Rack::const_iterator Rack::begin() const
     {
         return values_.begin();
     }
 
-    rack::iterator rack::end()
+    Rack::iterator Rack::end()
     {
         return values_.end();
     }
 
-    rack::const_iterator rack::end() const
+    Rack::const_iterator Rack::end() const
     {
         return values_.end();
     }
 
-    std::string rack::to_string() const
+    std::string Rack::to_string() const
     {
         std::string buf;
 
-        for (int i = 0; i < rack::size; i++) {
+        for (int i = 0; i < Rack::size; i++) {
             if (values_[i].empty()) {
                 continue;
             }

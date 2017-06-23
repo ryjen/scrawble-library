@@ -11,33 +11,33 @@
 
 namespace scrawble
 {
-    class game_logic
+    class GameLogic
     {
        public:
         static std::mt19937 random_generator;
 
-        game_logic();
+        GameLogic();
 
-        scrawble::player &player();
+        Player &player();
 
-        const scrawble::player &player() const;
+        const Player &player() const;
 
-        scrawble::board &board();
+        Board &board();
 
-        game_logic &finish_turn(int score);
+        GameLogic &finish_turn(int score);
 
         virtual std::set<std::string> hints() const = 0;
 
-        scrawble::bag &bag();
+        Bag &bag();
 
-        game_logic &init(const config &conf);
+        GameLogic &init(const Config &conf);
 
         virtual void init_dictionary(const std::string &fileName) = 0;
 
        protected:
-        scrawble::board board_;
-        scrawble::bag bag_;
-        std::vector<scrawble::player> players_;
+        Board board_;
+        Bag bag_;
+        std::vector<Player> players_;
         int turn_;
 
        private:

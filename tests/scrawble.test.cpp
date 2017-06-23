@@ -1,14 +1,12 @@
 #include <bandit/bandit.h>
 #include <fcntl.h>
-#include <scrawble/arc.h>
-#include <scrawble/gaddag.h>
 #include <scrawble/game_logic.h>
 #include <util/file_reader.h>
 #include <queue>
 
 using namespace bandit;
 
-class test_config : public scrawble::config
+class TestConfig : public scrawble::Config
 {
    public:
     constexpr static const char *ASSET_FOLDER = "tests/assets/";
@@ -40,23 +38,22 @@ class test_config : public scrawble::config
     }
 };
 
-class test_game : public scrawble::game_logic
+class TestGame : public scrawble::GameLogic
 {
-    scrawble::gaddag dictionary_;
-
    public:
     void init_dictionary(const std::string &fileName)
     {
-        file_reader reader(test_config::ASSET_FOLDER + fileName);
+        file_reader reader(TestConfig::ASSET_FOLDER + fileName);
 
-        for (auto line : reader) {
-            dictionary_.push(line);
-        }
+        // for (auto line : reader) {
+        //     dictionary_.push(line);
+        // }
     }
 
     std::set<std::string> hints() const
     {
-        return dictionary_.find(player().rack().to_string());
+        // return dictionary_.find(player().rack().to_string());
+        return {};
     }
 
     void set_player_rack(const std::initializer_list<char> &list)
@@ -69,15 +66,15 @@ class test_game : public scrawble::game_logic
 
 go_bandit([]() {
 
-    std::shared_ptr<test_game> game;
+    std::shared_ptr<TestGame> game;
 
     before_each([&game]() {
 
-        test_config config;
+        TestConfig config;
 
         config.load();
 
-        game = std::make_shared<test_game>();
+        game = std::make_shared<TestGame>();
 
         game->init(config);
     });

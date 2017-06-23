@@ -5,16 +5,16 @@
 
 namespace scrawble
 {
-    class tile
+    class Tile
     {
        public:
         typedef char value_type;
 
         static const value_type EMPTY;
 
-        tile();
+        Tile();
 
-        tile(const value_type &letter, int score);
+        Tile(const value_type &letter, int score);
 
         bool empty() const;
 
@@ -22,9 +22,9 @@ namespace scrawble
 
         value_type letter() const;
 
-        bool operator<(const tile &other) const;
+        bool operator<(const Tile &other) const;
 
-        bool operator==(const tile &other) const;
+        bool operator==(const Tile &other) const;
 
         bool operator<(const value_type &letter) const;
 

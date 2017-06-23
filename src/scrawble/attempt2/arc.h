@@ -7,7 +7,7 @@ namespace scrawble
 {
     class node;
     class path;
-    
+
     class arc
     {
        public:

@@ -8,40 +8,40 @@
 
 namespace scrawble
 {
-    class player
+    class Player
     {
        public:
-        player();
+        Player();
 
-        const scrawble::rack &rack() const;
+        const Rack &rack() const;
 
-        scrawble::rack &rack();
+        Rack &rack();
 
-        player &add_score(int score);
+        Player &add_score(int score);
 
         const std::string &name() const;
 
         const int score() const;
 
        private:
-        scrawble::rack rack_;
+        Rack rack_;
         int score_;
         std::string name_;
     };
 
-    class opponent : public player
+    class Opponent : public Player
     {
        public:
         virtual void play() = 0;
     };
 
-    class computer_player : public opponent
+    class ComputerPlayer : public Opponent
     {
        public:
         void play();
     };
 
-    class network_player : public opponent
+    class NetworkPlayer : public Opponent
     {
        public:
         void play();

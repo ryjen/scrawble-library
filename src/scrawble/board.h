@@ -9,48 +9,48 @@
 
 namespace scrawble
 {
-    class board
+    class Board
     {
        public:
         const static int size = 15;
 
-        board();
+        Board();
 
-        board(const board &other);
-        board(board &&other);
+        Board(const Board &other);
+        Board(Board &&other);
 
-        board &operator=(const board &other);
-        board &operator=(board &&other);
+        Board &operator=(const Board &other);
+        Board &operator=(Board &&other);
 
-        virtual ~board();
+        virtual ~Board();
 
-        tile &value(int x, int y);
+        Tile &value(int x, int y);
 
         short bonus(int x, int y, bool word = false);
 
-        tile place(int x, int y, const tile &value);
+        Tile place(int x, int y, const Tile &value);
 
-        board &reset(int x, int y);
+        Board &reset(int x, int y);
 
-        class row
+        class Row
         {
            public:
-            row(tile const value[size]);
-            row(const row &other);
-            row &operator=(const row &other);
+            Row(Tile const value[size]);
+            Row(const Row &other);
+            Row &operator=(const Row &other);
 
-            tile operator[](int index) const;
+            Tile operator[](int index) const;
 
            private:
-            tile values_[size];
+            Tile values_[size];
         };
 
-        row operator[](int index) const;
+        Row operator[](int index) const;
 
        private:
         void init();
-        void copy(const board &from);
-        tile values_[size][size];
+        void copy(const Board &from);
+        Tile values_[size][size];
         short wordBonus_[size][size];
         short letterBonus_[size][size];
     };

@@ -1,5 +1,4 @@
 #include <scrawble/game_logic.h>
-#include <scrawble/lexicon/node.h>
 #include <algorithm>
 #include <cassert>
 #include <fstream>
@@ -11,33 +10,34 @@ namespace scrawble
     {
         std::random_device rd;
     }
-    std::mt19937 game_logic::random_generator(detail::rd());
 
-    game_logic::game_logic() : players_(max_players)
+    std::mt19937 GameLogic::random_generator(detail::rd());
+
+    GameLogic::GameLogic() : players_(max_players)
     {
     }
 
-    scrawble::player &game_logic::player()
-    {
-        return players_[this_player_index];
-    }
-
-    const scrawble::player &game_logic::player() const
+    Player &GameLogic::player()
     {
         return players_[this_player_index];
     }
 
-    scrawble::board &game_logic::board()
+    const Player &GameLogic::player() const
+    {
+        return players_[this_player_index];
+    }
+
+    Board &GameLogic::board()
     {
         return board_;
     }
 
-    scrawble::bag &game_logic::bag()
+    Bag &GameLogic::bag()
     {
         return bag_;
     }
 
-    game_logic &game_logic::finish_turn(int score)
+    GameLogic &GameLogic::finish_turn(int score)
     {
         players_[turn_].add_score(score);
 
@@ -47,13 +47,13 @@ namespace scrawble
         return *this;
     }
 
-    game_logic &game_logic::init(const config &conf)
+    GameLogic &GameLogic::init(const Config &conf)
     {
         init_dictionary(conf.dictionary_file_name());
 
         for (auto t : conf.tile_distributions()) {
             for (int i = 0; i < t.count; i++) {
-                bag_.push(tile(t.letter, t.score));
+                bag_.push(Tile(t.letter, t.score));
             }
         }
         return *this;

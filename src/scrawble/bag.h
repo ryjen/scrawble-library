@@ -7,18 +7,20 @@
 
 namespace scrawble
 {
-    class bag
+    class Bag
     {
        public:
-        typedef std::vector<tile> list_type;
+        typedef std::vector<Tile> list_type;
 
-        bag &push(const tile &tile);
+        Bag &push(const Tile &tile);
 
-        tile next();
+        Bag &push(const Tile::value_type &letter, int score);
+
+        Tile next();
 
         bool empty() const;
 
-        tile next(char letter);
+        Tile next(char letter);
 
        private:
         list_type letters_;

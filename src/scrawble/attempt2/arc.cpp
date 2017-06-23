@@ -1,10 +1,9 @@
 #include <scrawble/arc.h>
+#include <scrawble/node.h>
 #include <scrawble/path.h>
 #include <scrawble/util.h>
-#include <scrawble/path.h>
-#include <scrawble/node.h>
-#include <memory>
 #include <algorithm>
+#include <memory>
 
 namespace scrawble
 {
@@ -16,26 +15,30 @@ namespace scrawble
     arc::arc(const node_ptr &value) : destination_(value)
     {
     }
-    
+
     arc::arc(const arc &other) : destination_(other.destination_), values_(other.values_)
-    {}
-    
+    {
+    }
+
     arc::arc(arc &&other) : destination_(std::move(other.destination_)), values_(std::move(other.values_))
-    {}
-    
-    arc::~arc() {}
-    
+    {
+    }
+
+    arc::~arc()
+    {
+    }
+
     arc &arc::operator=(const arc &other)
     {
         destination_ = other.destination_;
         values_ = other.values_;
         return *this;
     }
-    
+
     arc &arc::operator=(arc &&other)
     {
-        destination_ = other.destination_;
-        values_ = other.values_;
+        destination_ = std::move(other.destination_);
+        values_ = std::move(other.values_);
         return *this;
     }
 
@@ -47,7 +50,8 @@ namespace scrawble
 
     std::set<arc::path_ptr> arc::final_paths() const
     {
-        auto result = scrawble::map<value_type, path::ptr>(values_, [](const value_type &value) { return std::make_shared<path>(value); });
+        auto result = scrawble::map<value_type, path::ptr>(
+            values_, [](const value_type &value) { return std::make_shared<path>(value); });
 
         for (auto path : destination_->final_paths()) {
             result.insert(path);

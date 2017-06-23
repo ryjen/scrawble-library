@@ -3,46 +3,46 @@
 
 namespace scrawble
 {
-    const char tile::EMPTY = ' ';
+    const char Tile::EMPTY = ' ';
 
-    tile::tile() : score_(0), letter_(EMPTY)
+    Tile::Tile() : score_(0), letter_(EMPTY)
     {
     }
 
-    tile::tile(const value_type &letter, int score) : score_(score), letter_(letter)
+    Tile::Tile(const value_type &letter, int score) : score_(score), letter_(letter)
     {
     }
 
-    bool tile::empty() const
+    bool Tile::empty() const
     {
         return letter_ == EMPTY;
     }
 
-    int tile::score() const
+    int Tile::score() const
     {
         return score_;
     }
 
-    tile::value_type tile::letter() const
+    Tile::value_type Tile::letter() const
     {
         return letter_;
     }
 
-    bool tile::operator<(const tile &other) const
+    bool Tile::operator<(const Tile &other) const
     {
         return letter_ < other.letter_;
     }
-    bool tile::operator==(const tile &other) const
+    bool Tile::operator==(const Tile &other) const
     {
         return letter_ == other.letter_;
     }
 
-    bool tile::operator<(const value_type &letter) const
+    bool Tile::operator<(const value_type &letter) const
     {
         return letter_ < letter;
     }
 
-    bool tile::operator==(const value_type &letter) const
+    bool Tile::operator==(const value_type &letter) const
     {
         return letter_ == letter;
     }

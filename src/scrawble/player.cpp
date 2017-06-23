@@ -7,32 +7,32 @@
 
 namespace scrawble
 {
-    player::player() : rack_(), score_(0), name_()
+    Player::Player() : rack_(), score_(0), name_()
     {
     }
 
-    const scrawble::rack& player::rack() const
-    {
-        return rack_;
-    }
-
-    scrawble::rack& player::rack()
+    const Rack& Player::rack() const
     {
         return rack_;
     }
 
-    player& player::add_score(int score)
+    Rack& Player::rack()
+    {
+        return rack_;
+    }
+
+    Player& Player::add_score(int score)
     {
         score_ += score;
         return *this;
     }
 
-    const std::string& player::name() const
+    const std::string& Player::name() const
     {
         return name_;
     }
 
-    const int player::score() const
+    const int Player::score() const
     {
         return score_;
     }

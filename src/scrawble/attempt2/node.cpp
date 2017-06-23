@@ -3,29 +3,39 @@
 #include <scrawble/path.h>
 #include <scrawble/util.h>
 #include <algorithm>
-#include <memory>
 #include <cassert>
+#include <memory>
 
 namespace scrawble
 {
-    node::node() : arcs_() {}
-    
-    node::node(const node &other) : arcs_(other.arcs_) {}
-    
-    node::node(node &&other) : arcs_(std::move(other.arcs_)) {}
-    
-    node::~node() {}
-    
-    node &node::operator=(const node &other) {
+    node::node() : arcs_()
+    {
+    }
+
+    node::node(const node &other) : arcs_(other.arcs_)
+    {
+    }
+
+    node::node(node &&other) : arcs_(std::move(other.arcs_))
+    {
+    }
+
+    node::~node()
+    {
+    }
+
+    node &node::operator=(const node &other)
+    {
         arcs_ = other.arcs_;
         return *this;
     }
-    
-    node &node::operator=(node &&other) {
+
+    node &node::operator=(node &&other)
+    {
         arcs_ = std::move(other.arcs_);
         return *this;
     }
-    
+
     bool node::operator==(const node &other) const
     {
         return std::equal(arcs_.begin(), arcs_.end(), other.arcs_.begin());
@@ -34,13 +44,15 @@ namespace scrawble
     node::arc_ptr node::create_arc(const value_type &value, const destination_type &destination)
     {
         auto it = arcs_.find(value);
+
         if (it != arcs_.end()) {
             return it->second;
         }
 
-        arc_ptr arc = std::make_shared<scrawble::arc>(destination);
+        arc_ptr arc = std::make_shared<scrawble::arc>(destination ? destination : std::make_shared<node>());
 
         arcs_.emplace(value, arc);
+
         return arc;
     }
 
@@ -49,7 +61,8 @@ namespace scrawble
         return arcs_.count(value) > 0;
     }
 
-    node::arc_ptr node::create_final_arc(const value_type &value, const value_type &final, const destination_type &destination)
+    node::arc_ptr node::create_final_arc(const value_type &value, const value_type &final,
+                                         const destination_type &destination)
     {
         auto arc = create_arc(value, destination);
 
@@ -60,11 +73,14 @@ namespace scrawble
 
     node::destination_type node::create_path(const value_list &values, const destination_list &destinations)
     {
-        zip_type<value_type, destination_type> zipped = zip(values, destinations);
-        return reduce<destination_type, zip_item<value_type, destination_type>>(
-            shared_from_this(), zipped, [](destination_type &memo, const zip_item<value_type, destination_type> &value) {
-                return memo->create_arc(value.first, value.second)->destination();
-        });
+        auto zipped = zip(values, destinations);
+
+        reduce_callback<destination_type, zip_item<value_type, destination_type>> callback =
+            [](const destination_type &memo, const zip_item<value_type, destination_type> &value) -> destination_type {
+            return memo->create_arc(value.first, value.second)->destination();
+        };
+
+        return reduce(shared_from_this(), zipped, callback);
     }
 
     bool node::is_path(const value_list &values) const
@@ -85,19 +101,19 @@ namespace scrawble
     std::tuple<node::value_list, node::value_type, node::value_type> node::chop_last_pair(const value_list &values)
     {
         auto it = values.rbegin();
-        
+
         if (it == values.rend()) {
             return std::make_tuple(value_list(values.begin(), it.base()), value_type(), value_type());
         }
-        
+
         auto last_value = *it++;
-        
+
         if (it == values.rend()) {
             return std::make_tuple(value_list(values.begin(), it.base()), value_type(), last_value);
         }
-        
+
         auto second_last = *it++;
-        
+
         return std::make_tuple(value_list(values.begin(), it.base()), second_last, last_value);
     }
 
@@ -130,7 +146,7 @@ namespace scrawble
             return false;
         }
 
-        path final_path({std::get<1>(tuple), std::get<2>(tuple)});
+        path_ptr final_path(new path({std::get<1>(tuple), std::get<2>(tuple)}));
 
         auto final_paths = follow_path(remaining)->final_paths();
 
@@ -148,10 +164,10 @@ namespace scrawble
         return it->second->destination();
     }
 
-    const node::const_ptr &node::follow_path(const value_list &values) const
+    const node::ptr &node::follow_path(const value_list &values) const
     {
         if (values.empty()) {
-            return shared_from_this();
+            throw std::invalid_argument("empty values");
         }
         return follow_arc(values.front())->follow_path({values.back()});
     }
@@ -168,7 +184,7 @@ namespace scrawble
                     path.push_back(p2);
                 }
             }
-            result.emplace_back(path);
+            result.push_back(std::make_shared<scrawble::path>(path));
         }
         return result;
     }
