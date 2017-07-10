@@ -1,6 +1,7 @@
 #ifndef SCRAWBLE_UTIL_H
 #define SCRAWBLE_UTIL_H
 
+#include <cctype>
 #include <functional>
 #include <set>
 #include <sstream>
@@ -135,6 +136,16 @@ namespace scrawble
         std::vector<P1> v2(values.begin() + count, values.end());
 
         return {v1, v2};
+    }
+
+    inline bool isalpha(const std::string &letters)
+    {
+        for (auto &ch : letters) {
+            if (!std::isalpha(ch)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 

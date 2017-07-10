@@ -5,23 +5,23 @@
 #include <json.hpp>
 #include <string>
 
-class file_reader
+class FileReader
 {
    public:
-    class line : public std::string
+    class Line : public std::string
     {
        public:
-        friend std::istream &operator>>(std::istream &is, line &line);
+        friend std::istream &operator>>(std::istream &is, Line &line);
     };
 
-    typedef std::istream_iterator<line> iterator;
+    typedef std::istream_iterator<Line> iterator;
 
-    file_reader(const std::string &filePath) : input_(filePath)
+    FileReader(const std::string &filePath) : input_(filePath)
     {
         assert(input_.is_open());
     }
 
-    virtual ~file_reader()
+    virtual ~FileReader()
     {
         input_.close();
     }
@@ -60,7 +60,7 @@ class file_reader
     std::ifstream input_;
 };
 
-inline std::istream &operator>>(std::istream &is, file_reader::line &line)
+inline std::istream &operator>>(std::istream &is, FileReader::Line &line)
 {
     return std::getline(is, line);
 }

@@ -1,5 +1,7 @@
 #include <bandit/bandit.h>
 #include <fcntl.h>
+#include <scrawble/core/node.h>
+#include <scrawble/core/trie.h>
 #include <scrawble/game_logic.h>
 #include <util/file_reader.h>
 #include <queue>
@@ -13,7 +15,7 @@ class TestConfig : public scrawble::Config
 
     void load(const std::string &filepath)
     {
-        file_reader input(filepath);
+        FileReader input(filepath);
 
         nlohmann::json j = input.to_json();
 
@@ -43,7 +45,7 @@ class TestGame : public scrawble::GameLogic
    public:
     void init_dictionary(const std::string &fileName)
     {
-        file_reader reader(TestConfig::ASSET_FOLDER + fileName);
+        FileReader reader(TestConfig::ASSET_FOLDER + fileName);
 
         // for (auto line : reader) {
         //     dictionary_.push(line);
