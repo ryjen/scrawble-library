@@ -7,8 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace scrawble
-{
+namespace scrawble {
     /**
      * maps a vector of values to a vector of different values
      * @param values the values to map
@@ -16,8 +15,7 @@ namespace scrawble
      * @return a vector of mapped values
      */
     template <typename P1, typename P2>
-    std::vector<P2> map(const std::vector<P1> &values, const std::function<P2(const P1 &)> &callback)
-    {
+    std::vector<P2> map(const std::vector<P1> &values, const std::function<P2(const P1 &)> &callback) {
         std::vector<P2> result(values.size());
         for (const P1 &value : values) {
             result.push_back(callback(value));
@@ -26,8 +24,7 @@ namespace scrawble
     }
 
     template <typename P1, typename P2>
-    std::set<P2> map(const std::set<P1> &values, const std::function<P2(const P1 &)> &callback)
-    {
+    std::set<P2> map(const std::set<P1> &values, const std::function<P2(const P1 &)> &callback) {
         std::set<P2> result;
         for (const P1 &value : values) {
             result.insert(callback(value));
@@ -54,8 +51,7 @@ namespace scrawble
      * @return a vector of pairs from each parameters
      */
     template <typename P1, typename P2>
-    zip_type<P1, P2> zip(const std::vector<P1> &v1, const std::vector<P2> &v2)
-    {
+    zip_type<P1, P2> zip(const std::vector<P1> &v1, const std::vector<P2> &v2) {
         zip_type<P1, P2> result(v1.size());
 
         auto it = v2.begin();
@@ -82,8 +78,7 @@ namespace scrawble
      * @return the reduced value
      */
     template <typename P1, typename P2>
-    P1 reduce(const P1 &initial, const std::vector<P2> &values, const reduce_callback<P1, P2> &accumulator)
-    {
+    P1 reduce(const P1 &initial, const std::vector<P2> &values, const reduce_callback<P1, P2> &accumulator) {
         auto it = values.begin();
 
         if (it == values.end()) {
@@ -100,8 +95,7 @@ namespace scrawble
     }
 
     template <typename P1>
-    std::string join(const std::vector<P1> &value, const std::string &delimiter)
-    {
+    std::string join(const std::vector<P1> &value, const std::string &delimiter) {
         std::ostringstream buf;
 
         std::copy(value.begin(), value.end(), std::ostream_iterator<P1>(buf, delimiter.c_str()));
@@ -110,8 +104,7 @@ namespace scrawble
     }
 
     template <typename P1>
-    std::vector<P1> select(const std::vector<P1> &values, const std::function<bool(const P1 &)> &callback)
-    {
+    std::vector<P1> select(const std::vector<P1> &values, const std::function<bool(const P1 &)> &callback) {
         std::vector<P1> result;
 
         for (const P1 &value : values) {
@@ -126,8 +119,7 @@ namespace scrawble
     using split_type = std::pair<P1, P1>;
 
     template <typename P1>
-    split_type<std::vector<P1>> split(const std::vector<P1> &values, int count)
-    {
+    split_type<std::vector<P1>> split(const std::vector<P1> &values, int count) {
         assert(values.size() >= count);
 
         std::vector<P1> v1(values.begin(), values.begin() + count);
@@ -136,6 +128,15 @@ namespace scrawble
 
         return {v1, v2};
     }
-}
+
+    inline bool is_alpha(const std::string &value) {
+        for (auto &ch : value) {
+            if (!isalpha(ch)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}  // namespace scrawble
 
 #endif
