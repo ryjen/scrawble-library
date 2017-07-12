@@ -7,10 +7,8 @@
 #include <iterator>
 #include <vector>
 
-namespace scrawble
-{
-    class Board
-    {
+namespace scrawble {
+    class Board {
        public:
         const static int size = 15;
 
@@ -24,6 +22,12 @@ namespace scrawble
 
         virtual ~Board();
 
+        bool empty() const;
+        bool contains(int x, int y) const;
+
+        int width() const;
+        int height() const;
+
         Tile &value(int x, int y);
 
         short bonus(int x, int y, bool word = false);
@@ -32,8 +36,7 @@ namespace scrawble
 
         Board &reset(int x, int y);
 
-        class Row
-        {
+        class Row {
            public:
             Row(Tile const value[size]);
             Row(const Row &other);
@@ -54,6 +57,6 @@ namespace scrawble
         short wordBonus_[size][size];
         short letterBonus_[size][size];
     };
-}
+}  // namespace scrawble
 
 #endif

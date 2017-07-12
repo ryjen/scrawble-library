@@ -19,7 +19,7 @@ namespace scrawble {
     Trie &Trie::addWord(const std::string &word) {
         assert(!word.empty());
 
-        assert(is_alpha(word));
+        assert(isalpha(word));
 
         if (addNodes(word)) {
             wordCount_++;

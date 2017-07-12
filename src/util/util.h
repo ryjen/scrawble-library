@@ -1,6 +1,7 @@
 #ifndef SCRAWBLE_UTIL_H
 #define SCRAWBLE_UTIL_H
 
+#include <cctype>
 #include <functional>
 #include <set>
 #include <sstream>
@@ -15,18 +16,18 @@ namespace scrawble {
      * @return a vector of mapped values
      */
     template <typename P1, typename P2>
-    std::vector<P2> map(const std::vector<P1> &values, const std::function<P2(const P1 &)> &callback) {
+    std::vector<P2> map(const std::vector<P1>& values, const std::function<P2(const P1&)>& callback) {
         std::vector<P2> result(values.size());
-        for (const P1 &value : values) {
+        for (const P1& value : values) {
             result.push_back(callback(value));
         }
         return result;
     }
 
     template <typename P1, typename P2>
-    std::set<P2> map(const std::set<P1> &values, const std::function<P2(const P1 &)> &callback) {
+    std::set<P2> map(const std::set<P1>& values, const std::function<P2(const P1&)>& callback) {
         std::set<P2> result;
-        for (const P1 &value : values) {
+        for (const P1& value : values) {
             result.insert(callback(value));
         }
         return result;
@@ -51,12 +52,12 @@ namespace scrawble {
      * @return a vector of pairs from each parameters
      */
     template <typename P1, typename P2>
-    zip_type<P1, P2> zip(const std::vector<P1> &v1, const std::vector<P2> &v2) {
+    zip_type<P1, P2> zip(const std::vector<P1>& v1, const std::vector<P2>& v2) {
         zip_type<P1, P2> result(v1.size());
 
         auto it = v2.begin();
 
-        for (const P1 &value : v1) {
+        for (const P1& value : v1) {
             if (it == v2.end()) {
                 result.emplace_back(value, P2());
             } else {
@@ -68,7 +69,7 @@ namespace scrawble {
     }
 
     template <typename P1, typename P2>
-    using reduce_callback = std::function<P1(const P1 &, const P2 &)>;
+    using reduce_callback = std::function<P1(const P1&, const P2&)>;
 
     /**
      * reduces a vector by accumulation into a new value
@@ -78,7 +79,7 @@ namespace scrawble {
      * @return the reduced value
      */
     template <typename P1, typename P2>
-    P1 reduce(const P1 &initial, const std::vector<P2> &values, const reduce_callback<P1, P2> &accumulator) {
+    P1 reduce(const P1& initial, const std::vector<P2>& values, const reduce_callback<P1, P2>& accumulator) {
         auto it = values.begin();
 
         if (it == values.end()) {
@@ -95,7 +96,7 @@ namespace scrawble {
     }
 
     template <typename P1>
-    std::string join(const std::vector<P1> &value, const std::string &delimiter) {
+    std::string join(const std::vector<P1>& value, const std::string& delimiter) {
         std::ostringstream buf;
 
         std::copy(value.begin(), value.end(), std::ostream_iterator<P1>(buf, delimiter.c_str()));
@@ -104,10 +105,10 @@ namespace scrawble {
     }
 
     template <typename P1>
-    std::vector<P1> select(const std::vector<P1> &values, const std::function<bool(const P1 &)> &callback) {
+    std::vector<P1> select(const std::vector<P1>& values, const std::function<bool(const P1&)>& callback) {
         std::vector<P1> result;
 
-        for (const P1 &value : values) {
+        for (const P1& value : values) {
             if (callback(value)) {
                 result.push_back(value);
             }
@@ -119,7 +120,7 @@ namespace scrawble {
     using split_type = std::pair<P1, P1>;
 
     template <typename P1>
-    split_type<std::vector<P1>> split(const std::vector<P1> &values, int count) {
+    split_type<std::vector<P1>> split(const std::vector<P1>& values, int count) {
         assert(values.size() >= count);
 
         std::vector<P1> v1(values.begin(), values.begin() + count);
@@ -129,9 +130,9 @@ namespace scrawble {
         return {v1, v2};
     }
 
-    inline bool is_alpha(const std::string &value) {
-        for (auto &ch : value) {
-            if (!isalpha(ch)) {
+    inline bool isalpha(const std::string& letters) {
+        for (auto& ch : letters) {
+            if (!std::isalpha(ch)) {
                 return false;
             }
         }

@@ -3,10 +3,8 @@
 
 #include <string>
 
-namespace scrawble
-{
-    class Tile
-    {
+namespace scrawble {
+    class Tile {
        public:
         typedef char value_type;
 
@@ -17,6 +15,8 @@ namespace scrawble
         Tile(const value_type &letter, int score);
 
         bool empty() const;
+
+        virtual bool blank() const;
 
         int score() const;
 
@@ -34,6 +34,14 @@ namespace scrawble
         int score_;
         value_type letter_;
     };
-}
+
+    class BlankTile : public Tile {
+       public:
+        BlankTile();
+        BlankTile(const value_type &letter);
+
+        bool blank() const;
+    };
+}  // namespace scrawble
 
 #endif

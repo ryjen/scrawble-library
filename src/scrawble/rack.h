@@ -5,10 +5,8 @@
 #include <scrawble/tile.h>
 #include <array>
 
-namespace scrawble
-{
-    class Rack
-    {
+namespace scrawble {
+    class Rack {
        public:
         static const int size = 7;
         typedef std::array<Tile, size>::iterator iterator;
@@ -23,6 +21,7 @@ namespace scrawble
         Rack& clear();
         Rack& shuffle();
         Rack& fill(Bag& bag);
+        bool empty() const;
         Rack& pop(const Tile& t);
         Tile replace(size_t index, const Tile& tile);
         Rack& swap(size_t index1, size_t index2);
@@ -36,6 +35,6 @@ namespace scrawble
        private:
         std::array<Tile, size> values_;
     };
-}
+}  // namespace scrawble
 
 #endif
