@@ -5,15 +5,15 @@
 
 namespace scrawble
 {
-    Bag &Bag::push(const Tile &tile)
+    Bag &Bag::push(const Tile::Ptr &tile)
     {
         letters_.push_back(tile);
         return *this;
     }
 
-    Bag &Bag::push(const Tile::value_type &letter, int score)
+    Bag &Bag::push(const Tile::Type &letter, int score)
     {
-        letters_.emplace_back(letter, score);
+        letters_.emplace_back(std::make_shared<Tile>(letter, score));
         return *this;
     }
 
@@ -22,7 +22,7 @@ namespace scrawble
         return letters_.empty();
     }
 
-    Tile Bag::next()
+    Tile::Ptr Bag::next()
     {
         if (letters_.empty()) {
             throw std::out_of_range("No more letters");
@@ -45,13 +45,14 @@ namespace scrawble
         return value;
     }
 
-    Tile Bag::next(char letter)
+    Tile::Ptr Bag::next(char letter)
     {
         if (letters_.empty()) {
             throw std::out_of_range("No more letters");
         }
 
-        auto it = std::find(std::begin(letters_), std::end(letters_), letter);
+        auto it = std::find_if(std::begin(letters_), std::end(letters_),
+                               [&letter](const Tile::Ptr &tile) { return tile->letter() == letter; });
 
         if (it == std::end(letters_)) {
             throw std::out_of_range("invalid generated index");

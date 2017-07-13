@@ -6,9 +6,13 @@
 #include <scrawble/core/trie.h>
 #include <scrawble/core/trie_factory.h>
 #include <scrawble/rack.h>
+#include <algorithm>
+#include <random>
 
-namespace scrawble {
-    class Gaddag {
+namespace scrawble
+{
+    class Gaddag
+    {
         // used to generate random bool values
        private:
         Trie::Ptr trie_;
@@ -20,12 +24,7 @@ namespace scrawble {
          * @author Matt Sidesinger
          */
        protected:
-        typedef enum { UP, DOWN, LEFT, RIGHT } Direction;
-
-        constexpr static const Direction InverseDirection[] = {DOWN, UP, RIGHT, LEFT};
-        constexpr static const Direction PerpendicularDirection[] = {RIGHT, RIGHT, DOWN, DOWN};
-
-        typedef struct Dir {
+        typedef struct Direction {
             int xInc;
             int yInc;
 
@@ -35,7 +34,8 @@ namespace scrawble {
              * @param yInc
              *            When moving in this direction, how Y will be incremented to move to the next position.
              */
-            Dir(int xInc, int yInc) : xInc(xInc), yInc(yInc) {
+            Direction(int xInc, int yInc) : xInc(xInc), yInc(yInc)
+            {
             }
 
             /**
@@ -47,7 +47,8 @@ namespace scrawble {
              *
              * @return The next X coordinate in this direction.
              */
-            int nextX(int x) const {
+            int nextX(int x) const
+            {
                 return x + xInc;
             }
 
@@ -61,8 +62,27 @@ namespace scrawble {
              *
              * @return The next Y coordinate in this direction.
              */
-            int nextY(int y) const {
+            int nextY(int y) const
+            {
                 return y + yInc;
+            }
+
+            Direction inverse() const
+            {
+                if (xInc == 0) {
+                    return yInc == -1 ? DOWN : UP;
+                } else {
+                    return xInc == -1 ? RIGHT : LEFT;
+                }
+            }
+
+            Direction perpendicular() const
+            {
+                if (xInc == 0) {
+                    return RIGHT;
+                } else {
+                    return DOWN;
+                }
             }
 
             /**
@@ -79,7 +99,8 @@ namespace scrawble {
              *
              * @return <code>true</code> if processing can continue in this direction, <code>false</code> otherwise.
              */
-            bool hasNext(const Board &b, int x, int y) {
+            bool hasNext(const Board &b, int x, int y)
+            {
                 return b.contains(nextX(x), nextY(y));
             }
 
@@ -96,20 +117,27 @@ namespace scrawble {
              *
              * @return <code>true</code> if processing can continue in this direction, <code>false</code> otherwise.
              */
-            bool nextIsInBounds(const Board &b, int x, int y) {
+            bool nextIsInBounds(const Board &b, int x, int y)
+            {
                 int nx = nextX(x);
                 int ny = nextY(y);
                 return (1 <= nx && nx <= b.width()) && (1 <= ny && ny <= b.height());
             }
-        } Dir;
+        } Direction;
+
+        constexpr static const Direction UP(0, -1);
+        constexpr static const Direction DOWN(0, 1);
+        constexpr static const Direction LEFT(-1, 0);
+        constexpr static const Direction RIGHT(1, 0);
 
        public:
-        Gaddag(const TrieFactory &trieFactory) {
+        Gaddag(const TrieFactory &trieFactory)
+        {
             setTrie(trieFactory.createTrie());
         }
 
-       public:
-        std::vector<Move> randomPlacement(const Board &board, const Rack &rack) {
+        std::list<Move> randomPlacement(const Board &board, const Rack &rack)
+        {
             assert(!rack.empty());
 
             std::vector<std::list<Move>> allPlacements;
@@ -121,11 +149,11 @@ namespace scrawble {
                 int y = 0;
                 // go horizontal
                 auto tempPlacements =
-                    generateAllPlacements(board, x, y, x, y, rack, placements, trie_->getRoot(), Direction.RIGHT);
+                    generateAllPlacements(board, x, y, x, y, rack, placements, trie_->getRoot(), RIGHT);
                 allPlacements.insert(allPlacements.end(), tempPlacements.begin(), tempPlacements.end());
             } else {
-                int width = board.getWidth();
-                int height = board.getHeight();
+                int width = board.width();
+                int height = board.height();
 
                 for (int x = 1; x <= width; x++) {
                     for (int y = 1; y <= height; y++) {
@@ -134,16 +162,17 @@ namespace scrawble {
                             // Is there a tile to the East?
                             if (x < width && board.contains(x + 1, y)) {
                                 // go horizontal
-                                auto tempPlacements = generateAllPlacements(board, x, y, x, y, rack, placements,
-                                                                            trie_->getRoot(), Direction.RIGHT);
-                                allPlacements.addAll(tempPlacements);
+                                auto tempPlacements =
+                                    generateAllPlacements(board, x, y, x, y, rack, placements, trie_->getRoot(), RIGHT);
+                                allPlacements.insert(allPlacements.begin(), tempPlacements.begin(),
+                                                     tempPlacements.end());
                             }
 
                             // Is there a tile to the South?
                             if (y < height && board.contains(x, y + 1)) {
                                 // go vertical
-                                auto tempPlacements = generateAllPlacements(board, x, y, x, y, rack, placements,
-                                                                            trie_->getRoot(), Direction.DOWN);
+                                auto tempPlacements =
+                                    generateAllPlacements(board, x, y, x, y, rack, placements, trie_->getRoot(), DOWN);
                                 allPlacements.insert(allPlacements.begin(), tempPlacements.begin(),
                                                      tempPlacements.end());
                             }
@@ -154,13 +183,17 @@ namespace scrawble {
             }
 
             if (allPlacements.size() > 0) {
-                randomPlacement = allPlacements.at(r.nextInt(allPlacements.size()));
+                std::random_device rd;
+                std::mt19937 gen(rd());
+                std::uniform_int_distribution<int> distribution(0, allPlacements.size());
+                randomPlacement = allPlacements.at(distribution(gen));
             }
 
             return randomPlacement;
         }
 
-        std::vector<Move> longestPlacement(const Board &board, const Rack &rack) {
+        std::list<Move> longestPlacement(const Board &board, const Rack &rack)
+        {
             assert(!rack.empty());
 
             std::vector<std::list<Move>> allPlacements;
@@ -172,7 +205,7 @@ namespace scrawble {
                 int y = 0;
                 // go horizontal
                 auto tempPlacements =
-                    generateAllPlacements(board, x, y, x, y, rack, placements, trie_->getRoot(), Direction.RIGHT);
+                    generateAllPlacements(board, x, y, x, y, rack, placements, trie_->getRoot(), RIGHT);
                 allPlacements.insert(allPlacements.begin(), tempPlacements.begin(), tempPlacements.end());
 
             } else {
@@ -186,8 +219,8 @@ namespace scrawble {
                             // Is there a tile to the East?
                             if (x < width && board.contains(x + 1, y)) {
                                 // go horizontal
-                                auto tempPlacements = generateAllPlacements(board, x, y, x, y, rack, placements,
-                                                                            trie_->getRoot(), Direction.RIGHT);
+                                auto tempPlacements =
+                                    generateAllPlacements(board, x, y, x, y, rack, placements, trie_->getRoot(), RIGHT);
                                 allPlacements.insert(allPlacements.begin(), tempPlacements.begin(),
                                                      tempPlacements.end());
                             }
@@ -195,8 +228,8 @@ namespace scrawble {
                             // Is there a tile to the South?
                             if (y < height && board.contains(x, y + 1)) {
                                 // go vertical
-                                auto tempPlacements = generateAllPlacements(board, x, y, x, y, rack, placements,
-                                                                            trie_->getRoot(), Direction.DOWN);
+                                auto tempPlacements =
+                                    generateAllPlacements(board, x, y, x, y, rack, placements, trie_->getRoot(), DOWN);
                                 allPlacements.insert(allPlacements.begin(), tempPlacements.begin(),
                                                      tempPlacements.end());
                             }
@@ -207,11 +240,8 @@ namespace scrawble {
             }
 
             if (allPlacements.size() > 0) {
-                std::sort(allPlacements, []](const std::list<<Move> &o1, const std::list<Move> &o2)
-                    {
-                    return (o2.size() - o1.size());
-                    }
-                );
+                std::sort(allPlacements.begin(), allPlacements.end(),
+                          [](const std::list<Move> &o1, const std::list<Move> &o2) { return (o2.size() - o1.size()); });
                 longestPlacement = allPlacements.at(0);
             }
 
@@ -219,43 +249,44 @@ namespace scrawble {
         }
 
         std::vector<std::list<Move>> generateAllPlacements(const Board &board, int startX, int startY, int x, int y,
-                                                           const Rack &rack, const std::list<Move> &placements,
-                                                           const Node::Ptr &node, Direction direction) {
+                                                           Rack rack, std::list<Move> &placements,
+                                                           const Node::Ptr &node, Direction direction)
+        {
             std::vector<std::list<Move>> allPlacements;
 
             // check prerequisites
             if (!board.contains(x, y)) {
                 int currentNumberOfPlacements = placements.size();
-                int rackCount = rack.tileCount();
+                int rackCount = rack.count();
 
                 if (rackCount > 0) {
                     // take the Tile at the beginning of the Rack
-                    Tile toPlace = rack.take();
-                    // if (toPlace.blank()) {
-                    //     BlankTile.setLetter((toPlace), 'a');
-                    // }
+                    Tile::Ptr toPlace = rack.pop();
+                    if (toPlace->blank()) {
+                        toPlace->setLetter('a');
+                    }
 
                     Node::Ptr childNode;
                     // Cycle through the rack taking the first tile and adding it to the end until all tiles on the rack
                     // have been processed.
                     int i = 0;
                     while (true) {
-                        childNode = node->getChildNode(toPlace.getLetter());
+                        childNode = node->getChildNode(toPlace->letter());
 
                         if (childNode != nullptr && validateCrossWordExists(board, x, y, toPlace, direction)) {
                             if (toPlace.blank()) {
                                 // a copy must be placed as the tile placement since toPlace is being modified each
                                 // iteration
-                                placements.emplace(x, y, BlankTile(toPlace.getLetter()));
+                                placements.emplace(x, y, std::make_shared<BlankTile>(toPlace.letter()));
                             } else {
                                 placements.emplace(x, y, toPlace);
                             }
 
                             // Is this the end of the word?
-                            if (childNode.isTerminal() && !direction.hasNext(board, x, y)) {
+                            if (childNode->isTerminal() && !direction.hasNext(board, x, y)) {
                                 // Make sure that letters in front of the start position have been considered
-                                if (direction == Direction.LEFT || direction == Direction.UP ||
-                                    ((direction == Direction.RIGHT || direction == Direction.DOWN) &&
+                                if (direction == LEFT || direction == UP ||
+                                    ((direction == RIGHT || direction == DOWN) &&
                                      !direction.inverse().hasNext(board, startX, startY))) {
                                     std::list<Move> tempPlacements(placements);  // copy
                                     allPlacements.add(tempPlacements);
@@ -294,10 +325,10 @@ namespace scrawble {
                         }  // childNode != null`
 
                         // If this is a blank tile, the move to the tile?
-                        if (toPlace.isBlankTile()) {
-                            if (toPlace.getLetter() < 'z') {
+                        if (toPlace->blank()) {
+                            if (toPlace->letter() < 'z') {
                                 // increment the letter
-                                BlankTile.setLetter(((BlankTile)toPlace), (char)(toPlace.getLetter() + 1));
+                                toPlace.setLetter((char)(toPlace.letter() + 1));
                                 // Don't move to the next tile yet
                                 continue;
                             }
@@ -305,8 +336,8 @@ namespace scrawble {
 
                         // add the tile back to the end of the Rack
                         try {
-                            if (toPlace.isBlankTile()) {
-                                rack.add(new BlankTile());
+                            if (toPlace.blank()) {
+                                rack.add(std::make_shared<BlankTile>());
                             } else {
                                 rack.add(toPlace);
                             }
@@ -322,9 +353,9 @@ namespace scrawble {
                         }
 
                         // get the next tile from the rack
-                        toPlace = rack.take();
-                        if (toPlace.isBlankTile()) {
-                            BlankTile.setLetter(((BlankTile)toPlace), 'a');
+                        toPlace = rack.pop();
+                        if (toPlace->blank()) {
+                            toPlace->setLetter('a');
                         }
 
                     }  // while (true)
@@ -404,7 +435,8 @@ namespace scrawble {
             return allPlacements;
         }
 
-        std::vector<Move> calculateHighestScorePlacement(const Board &board, const Rack &rack) {
+        std::list<Move> calculateHighestScorePlacement(const Board &board, const Rack &rack)
+        {
             assert(!rack.empty());
 
             std::vector<Move> maxPlacement;
@@ -416,8 +448,7 @@ namespace scrawble {
                 int x = 0;
                 int y = 0;
                 // go horizontal
-                maxScore = calculateHighestScorePlacement(board, x, y, x, y, rack, placements, trie.getRoot(),
-                                                          Direction.RIGHT);
+                maxScore = calculateHighestScorePlacement(board, x, y, x, y, rack, placements, trie.getRoot(), RIGHT);
                 if (maxScore > 0) {
                     maxPlacement = placements;
                 }
@@ -436,7 +467,7 @@ namespace scrawble {
                                 // go horizontal
                                 placements.clear();
                                 score = calculateHighestScorePlacement(board, x, y, x, y, rack, placements,
-                                                                       trie.getRoot(), Direction.RIGHT);
+                                                                       trie.getRoot(), RIGHT);
                                 if (score > maxScore) {
                                     maxScore = score;
                                     maxPlacement = placements;  // copy
@@ -448,7 +479,7 @@ namespace scrawble {
                                 // go vertical
                                 placements.clear();
                                 score = calculateHighestScorePlacement(board, x, y, x, y, rack, placements,
-                                                                       trie.getRoot(), Direction.DOWN);
+                                                                       trie.getRoot(), DOWN);
                                 if (score > maxScore) {
                                     maxScore = score;
                                     maxPlacement = placements;  // copy
@@ -465,7 +496,8 @@ namespace scrawble {
 
         int calculateHighestScorePlacement(const Board &board, int startX, int startY, int x, int y, const Rack &rack,
                                            const std::list<Move> &placements, const Node::Ptr &node,
-                                           Direction direction) {
+                                           Direction direction)
+        {
             int maxScore = 0;
             int tempScore = 0;
             std::vector<Move> maxPlacement;
@@ -677,7 +709,8 @@ namespace scrawble {
          * @return      <code>true</code> if the perpendicular word is valid, otherwise </code>false</code.
          */
         bool validateCrossWordExists(const Board &board, int startX, int startY, const Tile &toPlace,
-                                     Direction direction) {
+                                     Direction direction)
+        {
             bool exists = false;
 
             Direction d = direction.perpendicular();
@@ -728,11 +761,13 @@ namespace scrawble {
             return exists;
         }
 
-        Trie::Ptr getTrie() const {
+        Trie::Ptr getTrie() const
+        {
             return trie_;
         }
 
-        void setTrie(const Trie::Ptr &trie) {
+        void setTrie(const Trie::Ptr &trie)
+        {
             trie_ = trie;
         }
     };

@@ -2,82 +2,119 @@
 #include <scrawble/rack.h>
 #include <stdexcept>
 
-namespace scrawble {
-    Tile Rack::operator[](size_t index) const {
+namespace scrawble
+{
+    Tile::Ptr Rack::operator[](size_t index) const
+    {
         return at(index);
     }
 
-    Tile Rack::at(size_t index) const {
+    Tile::Ptr Rack::at(size_t index) const
+    {
         if (index < size) {
             return values_[index];
         }
         throw std::out_of_range("invalid index for rack");
     }
-    Rack& Rack::push(const Tile& value) {
+    Rack& Rack::push(const Tile::Ptr& value)
+    {
         for (int i = 0; i < size; i++) {
-            if (values_[i].empty()) {
+            if (values_[i] == nullptr) {
                 values_[i] = value;
                 return *this;
             }
         }
         throw std::out_of_range("no more room in rack push");
     }
-    Rack& Rack::set(size_t index, const Tile& value) {
+    Rack& Rack::set(size_t index, const Tile::Ptr& value)
+    {
         if (index >= size) {
             throw std::out_of_range("no more room in rack push");
         }
         values_[index] = value;
         return *this;
     }
-    Tile Rack::pop(size_t index) {
+    Tile::Ptr Rack::pop()
+    {
+        for (int i = 0; i < size; i++) {
+            if (values_[i]) {
+                auto value = values_[i];
+                values_[i] = nullptr;
+                return value;
+            }
+        }
+        throw std::out_of_range("no more tiles in rack");
+    }
+
+    int Rack::count() const
+    {
+        int count = 0;
+        for (int i = 0; i < size; i++) {
+            if (values_[i]) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    Tile::Ptr Rack::pop(size_t index)
+    {
         if (index >= size) {
             throw std::out_of_range("invalid index for rack pop");
         }
 
-        Tile value = values_[index];
-        values_[index] = Tile();
+        Tile::Ptr value = values_[index];
+        values_[index] = nullptr;
         return value;
     }
 
-    Rack& Rack::clear() {
+    Rack& Rack::clear()
+    {
         for (int i = 0; i < Rack::size; i++) {
-            values_[i] = Tile();
+            values_[i] = nullptr;
         }
         return *this;
     }
 
-    bool Rack::empty() const {
+    bool Rack::empty() const
+    {
         for (int i = 0; i < Rack::size; i++) {
-            if (!values_[i].empty()) {
+            if (values_[i]) {
                 return false;
             }
         }
         return true;
     }
 
-    Rack& Rack::shuffle() {
+    Rack& Rack::shuffle()
+    {
         std::shuffle(begin(), end(), GameLogic::random_generator);
         return *this;
     }
 
-    Rack& Rack::fill(Bag& bag) {
+    Rack& Rack::fill(Bag& bag)
+    {
         for (int i = 0; i < Rack::size; i++) {
-            if (values_[i].empty()) {
+            if (values_[i] == nullptr) {
                 values_[i] = bag.next();
             }
         }
         return *this;
     }
 
-    Rack& Rack::pop(const Tile& t) {
-        auto it = std::find(begin(), end(), t);
-        if (it != end()) {
-            *it = Tile();
+    Rack& Rack::pop(const Tile::Ptr& t)
+    {
+        for (int i = 0; i < size; i++) {
+            if (values_[i] == t) {
+                values_[i] = nullptr;
+                break;
+            }
         }
         return *this;
     }
 
-    Tile Rack::replace(size_t index, const Tile& tile) {
+    Tile::Ptr Rack::replace(size_t index, const Tile::Ptr& tile)
+    {
         if (index >= Rack::size) {
             throw std::out_of_range("invalid index for player replace");
         }
@@ -89,7 +126,8 @@ namespace scrawble {
         return existing;
     }
 
-    Rack& Rack::swap(size_t index1, size_t index2) {
+    Rack& Rack::swap(size_t index1, size_t index2)
+    {
         if (index1 >= Rack::size || index2 >= Rack::size) {
             throw std::out_of_range("invalid index to player swap");
         }
@@ -102,31 +140,36 @@ namespace scrawble {
         return *this;
     }
 
-    Rack::iterator Rack::begin() {
+    Rack::iterator Rack::begin()
+    {
         return values_.begin();
     }
 
-    Rack::const_iterator Rack::begin() const {
+    Rack::const_iterator Rack::begin() const
+    {
         return values_.begin();
     }
 
-    Rack::iterator Rack::end() {
+    Rack::iterator Rack::end()
+    {
         return values_.end();
     }
 
-    Rack::const_iterator Rack::end() const {
+    Rack::const_iterator Rack::end() const
+    {
         return values_.end();
     }
 
-    std::string Rack::to_string() const {
+    std::string Rack::to_string() const
+    {
         std::string buf;
 
         for (int i = 0; i < Rack::size; i++) {
-            if (values_[i].empty()) {
+            if (values_[i] == nullptr) {
                 continue;
             }
 
-            buf += values_[i].letter();
+            buf += values_[i]->letter();
         }
 
         return buf;

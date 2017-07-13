@@ -3,42 +3,42 @@
 
 #include <string>
 
-namespace scrawble {
-    class Tile {
+namespace scrawble
+{
+    class Tile
+    {
        public:
-        typedef char value_type;
-
-        static const value_type EMPTY;
+        typedef char Type;
+        typedef std::shared_ptr<Tile> Ptr;
 
         Tile();
 
-        Tile(const value_type &letter, int score);
-
-        bool empty() const;
+        Tile(const Type &letter, int score);
 
         virtual bool blank() const;
 
         int score() const;
 
-        value_type letter() const;
+        Type letter() const;
 
         bool operator<(const Tile &other) const;
 
         bool operator==(const Tile &other) const;
 
-        bool operator<(const value_type &letter) const;
+        bool operator<(const Type &letter) const;
 
-        bool operator==(const value_type &letter) const;
+        bool operator==(const Type &letter) const;
 
        private:
         int score_;
-        value_type letter_;
+        Type letter_;
     };
 
-    class BlankTile : public Tile {
+    class BlankTile : public Tile
+    {
        public:
         BlankTile();
-        BlankTile(const value_type &letter);
+        BlankTile(const Type &letter);
 
         bool blank() const;
     };

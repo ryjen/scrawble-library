@@ -5,25 +5,29 @@
 #include <scrawble/tile.h>
 #include <array>
 
-namespace scrawble {
-    class Rack {
+namespace scrawble
+{
+    class Rack
+    {
        public:
         static const int size = 7;
-        typedef std::array<Tile, size>::iterator iterator;
-        typedef std::array<Tile, size>::const_iterator const_iterator;
+        typedef std::array<Tile::Ptr, size>::iterator iterator;
+        typedef std::array<Tile::Ptr, size>::const_iterator const_iterator;
 
-        Tile operator[](size_t index) const;
+        Tile::Ptr operator[](size_t index) const;
 
-        Tile at(size_t index) const;
-        Rack& push(const Tile& value);
-        Rack& set(size_t index, const Tile& value);
-        Tile pop(size_t index);
+        Tile::Ptr at(size_t index) const;
+        Rack& push(const Tile::Ptr& value);
+        Rack& set(size_t index, const Tile::Ptr& value);
+        Tile::Ptr pop(size_t index);
+        Tile::Ptr pop();
+        int count() const;
         Rack& clear();
         Rack& shuffle();
         Rack& fill(Bag& bag);
         bool empty() const;
-        Rack& pop(const Tile& t);
-        Tile replace(size_t index, const Tile& tile);
+        Rack& pop(const Tile::Ptr& t);
+        Tile::Ptr replace(size_t index, const Tile::Ptr& tile);
         Rack& swap(size_t index1, size_t index2);
         iterator begin();
         const_iterator begin() const;
@@ -33,7 +37,7 @@ namespace scrawble {
         std::string to_string() const;
 
        private:
-        std::array<Tile, size> values_;
+        std::array<Tile::Ptr, size> values_;
     };
 }  // namespace scrawble
 

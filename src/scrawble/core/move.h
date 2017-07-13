@@ -3,16 +3,19 @@
 
 #include <scrawble/tile.h>
 
-namespace scrawble {
-    class Move {
+namespace scrawble
+{
+    class Move
+    {
        public:
-        Move(int x, int y, const Tile &tile) : x_(x), y_(y), tile_(tile) {
+        Move(int x, int y, const Tile::Ptr &tile) : x_(x), y_(y), tile_(tile)
+        {
         }
 
        private:
         int x_;
         int y_;
-        Tile tile_;
+        Tile::Ptr tile_;
     };
 }  // namespace scrawble
 

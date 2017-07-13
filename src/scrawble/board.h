@@ -7,8 +7,10 @@
 #include <iterator>
 #include <vector>
 
-namespace scrawble {
-    class Board {
+namespace scrawble
+{
+    class Board
+    {
        public:
         const static int size = 15;
 
@@ -28,24 +30,25 @@ namespace scrawble {
         int width() const;
         int height() const;
 
-        Tile &value(int x, int y);
+        Tile::Ptr &value(int x, int y);
 
         short bonus(int x, int y, bool word = false);
 
-        Tile place(int x, int y, const Tile &value);
+        Tile::Ptr place(int x, int y, const Tile::Ptr &value);
 
         Board &reset(int x, int y);
 
-        class Row {
+        class Row
+        {
            public:
-            Row(Tile const value[size]);
+            Row(Tile::Ptr const value[size]);
             Row(const Row &other);
             Row &operator=(const Row &other);
 
-            Tile operator[](int index) const;
+            Tile::Ptr operator[](int index) const;
 
            private:
-            Tile values_[size];
+            Tile::Ptr values_[size];
         };
 
         Row operator[](int index) const;
@@ -53,7 +56,7 @@ namespace scrawble {
        private:
         void init();
         void copy(const Board &from);
-        Tile values_[size][size];
+        Tile::Ptr values_[size][size];
         short wordBonus_[size][size];
         short letterBonus_[size][size];
     };

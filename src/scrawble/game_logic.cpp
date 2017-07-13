@@ -53,7 +53,7 @@ namespace scrawble
 
         for (auto t : conf.tile_distributions()) {
             for (int i = 0; i < t.count; i++) {
-                bag_.push(Tile(t.letter, t.score));
+                bag_.push(std::make_unique<Tile>(t.letter, t.score));
             }
         }
         return *this;
