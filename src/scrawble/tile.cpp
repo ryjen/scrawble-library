@@ -16,6 +16,10 @@ namespace scrawble
         return true;
     }
 
+    Tile::Tile() : score_(0), letter_(0)
+    {
+    }
+
     Tile::Tile(const Type &letter, int score) : score_(score), letter_(letter)
     {
     }
@@ -33,6 +37,12 @@ namespace scrawble
     Tile::Type Tile::letter() const
     {
         return letter_;
+    }
+
+    Tile &Tile::letter(const Type &value)
+    {
+        letter_ = value;
+        return *this;
     }
 
     bool Tile::operator<(const Tile &other) const

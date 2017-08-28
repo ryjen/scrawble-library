@@ -121,7 +121,7 @@ namespace scrawble
         return values_[x][y];
     }
 
-    short Board::bonus(int x, int y, bool word)
+    short Board::bonus(int x, int y, bool word) const
     {
         return word ? wordBonus_[x][y] : letterBonus_[x][y];
     }

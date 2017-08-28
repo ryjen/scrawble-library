@@ -34,7 +34,7 @@ set(TEST_PROJECT_NAME "${PROJECT_NAME}_test")
 
 set(VENDOR_PATH ${CMAKE_CURRENT_LIST_DIR}/vendor)
 
-include_directories(src)
+include_directories(src  ${VENDOR_PATH}/includes)
 
 # add directories
 add_subdirectory(src)

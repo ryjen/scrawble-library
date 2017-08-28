@@ -32,6 +32,11 @@ namespace scrawble
         return board_;
     }
 
+    const Board &GameLogic::board() const
+    {
+        return board_;
+    }
+
     Bag &GameLogic::bag()
     {
         return bag_;

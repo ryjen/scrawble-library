@@ -32,7 +32,7 @@ namespace scrawble
 
         Tile::Ptr &value(int x, int y);
 
-        short bonus(int x, int y, bool word = false);
+        short bonus(int x, int y, bool word = false) const;
 
         Tile::Ptr place(int x, int y, const Tile::Ptr &value);
 

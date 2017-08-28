@@ -7,8 +7,7 @@ set(SOURCE_FILES
 	player.cpp
 	tile.cpp
 	rack.cpp
-	attempt3/node.cpp
-	attempt3/trie.cpp
+	core/gaddag.cpp
 )
 
 add_library(${PROJECT_NAME} ${SOURCE_FILES})

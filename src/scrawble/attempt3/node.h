@@ -4,12 +4,14 @@
 #include <map>
 #include <memory>
 
-namespace scrawble {
-    class Node : public std::enable_shared_from_this<Node> {
+namespace scrawble
+{
+    class Node : public std::enable_shared_from_this<Node>
+    {
        public:
         typedef char Type;
         typedef std::shared_ptr<Node> Ptr;
-        static const char CROSS_ANCHOR_CHAR = '#';
+        constexpr static const char CROSS_ANCHOR_CHAR = '#';
 
         Node();
         Node(const Type &value, bool terminal, const Ptr &parentNode);

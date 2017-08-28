@@ -2,6 +2,7 @@
 #define SCRAWBLE_NODE_H
 
 #include <algorithm>
+#include <cassert>
 #include <map>
 #include <memory>
 
@@ -24,7 +25,7 @@ namespace scrawble
          * A special character that represents a crossing of the anchor during processing; if that makes much sense.
          */
        public:
-        const static char CROSS_ANCHOR_CHAR = '#';
+        static const char CROSS_ANCHOR_CHAR;
 
         /**
          * Creates and returns a root node.
@@ -69,11 +70,6 @@ namespace scrawble
             root_ = root;
         }
 
-        void setLetter(Type letter)
-        {
-            letter_ = letter;
-        }
-
         void setParentNode(const Ptr& node)
         {
             parentNode_ = node;
@@ -100,6 +96,11 @@ namespace scrawble
         Type getLetter() const
         {
             return letter_;
+        }
+
+        void setLetter(Type letter)
+        {
+            letter_ = letter;
         }
 
         void setTerminal(bool terminal)

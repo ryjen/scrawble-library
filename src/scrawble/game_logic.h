@@ -24,6 +24,8 @@ namespace scrawble
 
         Board &board();
 
+        const Board &board() const;
+
         GameLogic &finish_turn(int score);
 
         virtual std::set<std::string> hints() const = 0;

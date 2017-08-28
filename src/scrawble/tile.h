@@ -21,6 +21,8 @@ namespace scrawble
 
         Type letter() const;
 
+        Tile &letter(const Type &value);
+
         bool operator<(const Tile &other) const;
 
         bool operator==(const Tile &other) const;

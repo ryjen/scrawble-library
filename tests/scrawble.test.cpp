@@ -10,11 +10,13 @@
 
 using namespace bandit;
 
-class TestConfig : public scrawble::Config {
+class TestConfig : public scrawble::Config
+{
    public:
     constexpr static const char *ASSET_FOLDER = "tests/assets/";
 
-    void load(const std::string &filepath) {
+    void load(const std::string &filepath)
+    {
         FileReader input(filepath);
 
         nlohmann::json j = input.to_json();
@@ -34,27 +36,38 @@ class TestConfig : public scrawble::Config {
         }
     }
 
-    void load() {
+    void load()
+    {
         load(std::string(ASSET_FOLDER) + "english.json");
     }
 };
 
-class TestGame : public scrawble::GameLogic {
+class TestGame : public scrawble::GameLogic
+{
+    std::shared_ptr<scrawble::Gaddag> dictionary_;
+
    public:
-    void init_dictionary(const std::string &fileName) {
-        FileReader reader(TestConfig::ASSET_FOLDER + fileName);
+    void init_dictionary(const std::string &fileName)
+    {
+        scrawble::FileBasedTrieFactory factory(TestConfig::ASSET_FOLDER + fileName);
 
-        // for (auto line : reader) {
-        //     dictionary_.push(line);
-        // }
+        dictionary_ = std::make_shared<scrawble::Gaddag>(factory);
     }
 
-    std::set<std::string> hints() const {
-        // return dictionary_.find(player().rack().to_string());
-        return {};
+    std::set<std::string> hints() const
+    {
+        auto moves = dictionary_->calculateHighestScorePlacement(board(), player().rack());
+        std::string buf;
+        for (auto &move : moves) {
+            buf += move.letter();
+        }
+        std::set<std::string> rval;
+        rval.insert(buf);
+        return rval;
     }
 
-    void set_player_rack(const std::initializer_list<char> &list) {
+    void set_player_rack(const std::initializer_list<char> &list)
+    {
         for (auto ch : list) {
             player().rack().push(bag().next(ch));
         }

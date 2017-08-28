@@ -2,57 +2,69 @@
 #include <cassert>
 #include <vector>
 
-namespace scrawble {
-
-    Node::Node() : root_(true), childNodes_() {
+namespace scrawble
+{
+    Node::Node() : root_(true), childNodes_()
+    {
     }
 
     Node::Node(const Type &letter, bool terminal, const Node::Ptr &parentNode)
-        : letter_(tolower(letter)), terminal_(terminal), parentNode_(parentNode) {
+        : letter_(tolower(letter)), terminal_(terminal), parentNode_(parentNode)
+    {
         assert(isalpha(letter) || letter == CROSS_ANCHOR_CHAR);
     }
 
-    Node &Node::setRoot(bool value) {
+    Node &Node::setRoot(bool value)
+    {
         root_ = value;
         return *this;
     }
 
-    bool Node::isRoot() const {
+    bool Node::isRoot() const
+    {
         return root_;
     }
 
-    bool Node::isCrossAnchorNode() const {
+    bool Node::isCrossAnchorNode() const
+    {
         return letter_ == CROSS_ANCHOR_CHAR;
     }
 
-    Node &Node::setLetter(const Type &value) {
+    Node &Node::setLetter(const Type &value)
+    {
         letter_ = value;
         return *this;
     }
 
-    Node::Type Node::getLetter() const {
+    Node::Type Node::getLetter() const
+    {
         return letter_;
     }
 
-    Node &Node::setTerminal(bool terminal) {
+    Node &Node::setTerminal(bool terminal)
+    {
         terminal_ = terminal;
         return *this;
     }
 
-    bool Node::isTerminal() const {
+    bool Node::isTerminal() const
+    {
         return terminal_;
     }
 
-    Node &Node::setParentNode(const Node::Ptr &node) {
+    Node &Node::setParentNode(const Node::Ptr &node)
+    {
         parentNode_ = node;
         return *this;
     }
 
-    Node::Ptr Node::getParentNode() const {
+    Node::Ptr Node::getParentNode() const
+    {
         return parentNode_;
     }
 
-    Node::Ptr Node::addChildNode(const Type &letter, bool terminal) {
+    Node::Ptr Node::addChildNode(const Type &letter, bool terminal)
+    {
         char lowerLetter = tolower(letter);
 
         // see if this child node already exists
@@ -66,7 +78,8 @@ namespace scrawble {
         return childNode;
     }
 
-    Node::Ptr Node::getOrAddChildNode(const Type &letter, bool terminal) {
+    Node::Ptr Node::getOrAddChildNode(const Type &letter, bool terminal)
+    {
         Node::Ptr node = nullptr;
 
         Type lowerLetter = tolower(letter);
@@ -93,11 +106,13 @@ namespace scrawble {
      *
      * @see #addChildNode(char, boolean)
      */
-    Node::Ptr Node::addChildCrossAnchorNode() {
+    Node::Ptr Node::addChildCrossAnchorNode()
+    {
         return addChildNode(CROSS_ANCHOR_CHAR, false);
     }
 
-    Node::Ptr Node::getChildNode(const Type &letter) const {
+    Node::Ptr Node::getChildNode(const Type &letter) const
+    {
         auto it = childNodes_.find(tolower(letter));
 
         if (it == childNodes_.end()) {
@@ -106,7 +121,8 @@ namespace scrawble {
         return it->second;
     }
 
-    Node::Ptr Node::getCrossAnchorNode() const {
+    Node::Ptr Node::getCrossAnchorNode() const
+    {
         auto it = childNodes_.find(CROSS_ANCHOR_CHAR);
 
         if (it == childNodes_.end()) {
@@ -115,7 +131,8 @@ namespace scrawble {
         return it->second;
     }
 
-    std::vector<Node::Ptr> Node::getChildNodes() const {
+    std::vector<Node::Ptr> Node::getChildNodes() const
+    {
         std::vector<Node::Ptr> values(childNodes_.size());
 
         for (auto &entry : childNodes_) {

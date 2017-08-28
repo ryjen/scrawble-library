@@ -7,128 +7,124 @@
 #include <scrawble/core/trie_factory.h>
 #include <scrawble/rack.h>
 #include <algorithm>
+#include <list>
 #include <random>
 
 namespace scrawble
 {
+    template <typename T>
+    T random_number(const T &r1, const T &r2)
+    {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<T> dis(r1, r2);
+        return dis(gen);
+    }
+
+    class Direction
+    {
+        int xInc;
+        int yInc;
+
+       public:
+        /**
+         * @param xInc
+         *            When moving in this direction, how X will be incremented to move to the next position.
+         * @param yInc
+         *            When moving in this direction, how Y will be incremented to move to the next position.
+         */
+        constexpr Direction(int xInc, int yInc) : xInc(xInc), yInc(yInc)
+        {
+        }
+
+        /**
+         * Obtains the next X coordinate in this direction given the current X coordinate.
+         * <p>
+         * There is no bounds checking in place. hasNext should be called first.
+         *
+         * @param x     The current X coordinate.
+         *
+         * @return The next X coordinate in this direction.
+         */
+        int nextX(int x) const
+        {
+            return x + xInc;
+        }
+
+        /**
+         * Obtains the next Y coordinate in this direction given the current Y coordinate.
+         * <p>
+         * There is no bounds checking in place. hasNext should be called first.
+         *
+         * @param y
+         *            The current Y coordinate.
+         *
+         * @return The next Y coordinate in this direction.
+         */
+        int nextY(int y) const
+        {
+            return y + yInc;
+        }
+
+        Direction inverse() const;
+
+        Direction perpendicular() const;
+
+        /**
+         * Obtains the next tile in this direction given the current X, Y coordinates on the Board.
+         * <p>
+         * If the next coordinates do not exist, then <code>null</code> is returned.
+         *
+         * @param b
+         *            The Board that is currently being worked on.
+         * @param x
+         *            The current X coordinate.
+         * @param y
+         *            The current Y coordinate.
+         *
+         * @return <code>true</code> if processing can continue in this direction, <code>false</code> otherwise.
+         */
+        bool hasNext(const Board &b, int x, int y)
+        {
+            return b.contains(nextX(x), nextY(y));
+        }
+
+        /**
+         * Determines whether processing can continue in this direction given the current X, Y coordinates on the
+         * Board.
+         *
+         * @param b
+         *            The Board that is currently being worked on.
+         * @param x
+         *            The current X coordinate.
+         * @param y
+         *            The current Y coordinate.
+         *
+         * @return <code>true</code> if processing can continue in this direction, <code>false</code> otherwise.
+         */
+        bool nextIsInBounds(const Board &b, int x, int y)
+        {
+            int nx = nextX(x);
+            int ny = nextY(y);
+            return (1 <= nx && nx <= b.width()) && (1 <= ny && ny <= b.height());
+        }
+
+        bool operator==(const Direction &dir) const
+        {
+            return xInc == dir.xInc && yInc == dir.yInc;
+        }
+    };
+
+    constexpr static const Direction UP(0, -1);
+    constexpr static const Direction DOWN(0, 1);
+    constexpr static const Direction LEFT(-1, 0);
+    constexpr static const Direction RIGHT(1, 0);
+
     class Gaddag
     {
         // used to generate random bool values
        private:
         Trie::Ptr trie_;
-
-        /**
-         * Passed to some methods to indicate which direction to place tiles while the algorithm is performing
-         * processing.
-         *
-         * @author Matt Sidesinger
-         */
-       protected:
-        typedef struct Direction {
-            int xInc;
-            int yInc;
-
-            /**
-             * @param xInc
-             *            When moving in this direction, how X will be incremented to move to the next position.
-             * @param yInc
-             *            When moving in this direction, how Y will be incremented to move to the next position.
-             */
-            Direction(int xInc, int yInc) : xInc(xInc), yInc(yInc)
-            {
-            }
-
-            /**
-             * Obtains the next X coordinate in this direction given the current X coordinate.
-             * <p>
-             * There is no bounds checking in place. hasNext should be called first.
-             *
-             * @param x     The current X coordinate.
-             *
-             * @return The next X coordinate in this direction.
-             */
-            int nextX(int x) const
-            {
-                return x + xInc;
-            }
-
-            /**
-             * Obtains the next Y coordinate in this direction given the current Y coordinate.
-             * <p>
-             * There is no bounds checking in place. hasNext should be called first.
-             *
-             * @param y
-             *            The current Y coordinate.
-             *
-             * @return The next Y coordinate in this direction.
-             */
-            int nextY(int y) const
-            {
-                return y + yInc;
-            }
-
-            Direction inverse() const
-            {
-                if (xInc == 0) {
-                    return yInc == -1 ? DOWN : UP;
-                } else {
-                    return xInc == -1 ? RIGHT : LEFT;
-                }
-            }
-
-            Direction perpendicular() const
-            {
-                if (xInc == 0) {
-                    return RIGHT;
-                } else {
-                    return DOWN;
-                }
-            }
-
-            /**
-             * Obtains the next tile in this direction given the current X, Y coordinates on the Board.
-             * <p>
-             * If the next coordinates do not exist, then <code>null</code> is returned.
-             *
-             * @param b
-             *            The Board that is currently being worked on.
-             * @param x
-             *            The current X coordinate.
-             * @param y
-             *            The current Y coordinate.
-             *
-             * @return <code>true</code> if processing can continue in this direction, <code>false</code> otherwise.
-             */
-            bool hasNext(const Board &b, int x, int y)
-            {
-                return b.contains(nextX(x), nextY(y));
-            }
-
-            /**
-             * Determines whether processing can continue in this direction given the current X, Y coordinates on the
-             * Board.
-             *
-             * @param b
-             *            The Board that is currently being worked on.
-             * @param x
-             *            The current X coordinate.
-             * @param y
-             *            The current Y coordinate.
-             *
-             * @return <code>true</code> if processing can continue in this direction, <code>false</code> otherwise.
-             */
-            bool nextIsInBounds(const Board &b, int x, int y)
-            {
-                int nx = nextX(x);
-                int ny = nextY(y);
-                return (1 <= nx && nx <= b.width()) && (1 <= ny && ny <= b.height());
-            }
-        } Direction;
-
-        constexpr static const Direction UP(0, -1);
-        constexpr static const Direction DOWN(0, 1);
-        constexpr static const Direction LEFT(-1, 0);
-        constexpr static const Direction RIGHT(1, 0);
 
        public:
         Gaddag(const TrieFactory &trieFactory)
@@ -136,7 +132,7 @@ namespace scrawble
             setTrie(trieFactory.createTrie());
         }
 
-        std::list<Move> randomPlacement(const Board &board, const Rack &rack)
+        std::list<Move> randomPlacement(const Board &board, Rack rack)
         {
             assert(!rack.empty());
 
@@ -192,7 +188,7 @@ namespace scrawble
             return randomPlacement;
         }
 
-        std::list<Move> longestPlacement(const Board &board, const Rack &rack)
+        std::list<Move> longestPlacement(const Board &board, Rack rack)
         {
             assert(!rack.empty());
 
@@ -248,8 +244,9 @@ namespace scrawble
             return longestPlacement;
         }
 
+       private:
         std::vector<std::list<Move>> generateAllPlacements(const Board &board, int startX, int startY, int x, int y,
-                                                           Rack rack, std::list<Move> &placements,
+                                                           Rack &rack, std::list<Move> &placements,
                                                            const Node::Ptr &node, Direction direction)
         {
             std::vector<std::list<Move>> allPlacements;
@@ -263,7 +260,7 @@ namespace scrawble
                     // take the Tile at the beginning of the Rack
                     Tile::Ptr toPlace = rack.pop();
                     if (toPlace->blank()) {
-                        toPlace->setLetter('a');
+                        toPlace->letter('a');
                     }
 
                     Node::Ptr childNode;
@@ -274,12 +271,12 @@ namespace scrawble
                         childNode = node->getChildNode(toPlace->letter());
 
                         if (childNode != nullptr && validateCrossWordExists(board, x, y, toPlace, direction)) {
-                            if (toPlace.blank()) {
+                            if (toPlace->blank()) {
                                 // a copy must be placed as the tile placement since toPlace is being modified each
                                 // iteration
-                                placements.emplace(x, y, std::make_shared<BlankTile>(toPlace.letter()));
+                                placements.push_back(Move(x, y, std::make_shared<BlankTile>(toPlace->letter())));
                             } else {
-                                placements.emplace(x, y, toPlace);
+                                placements.push_back(Move(x, y, toPlace));
                             }
 
                             // Is this the end of the word?
@@ -289,7 +286,7 @@ namespace scrawble
                                     ((direction == RIGHT || direction == DOWN) &&
                                      !direction.inverse().hasNext(board, startX, startY))) {
                                     std::list<Move> tempPlacements(placements);  // copy
-                                    allPlacements.add(tempPlacements);
+                                    allPlacements.push_back(tempPlacements);
                                 }
                             }
 
@@ -301,10 +298,10 @@ namespace scrawble
                             } else {
                                 // Have to switch directions if we want to keep going...
                                 // To switch direction we need a cross anchor node.
-                                Node::Ptr crossAnchorNode = childNode.getCrossAnchorNode();
+                                Node::Ptr crossAnchorNode = childNode->getCrossAnchorNode();
                                 if (crossAnchorNode != nullptr) {
                                     // switch directions
-                                    Direction inverse = InverseDirection[direction];
+                                    Direction inverse = direction.inverse();
                                     if (inverse.nextIsInBounds(board, startX, startY)) {
                                         tempAllPlacements = generateAllPlacements(
                                             board, startX, startY, inverse.nextX(startX), inverse.nextY(startY), rack,
@@ -314,13 +311,14 @@ namespace scrawble
                             }
 
                             if (tempAllPlacements.size() > 0) {
-                                allPlacements.insert(allPlacements.begin(), tempAllPlacements.begin(),
-                                                     tempAllPlacements.end());
+                                for (auto value : tempAllPlacements) {
+                                    allPlacements.push_back(value);
+                                }
                             }
 
                             // remove any placements that were added
                             while (placements.size() > currentNumberOfPlacements) {
-                                placements.removeLast();
+                                placements.pop_back();
                             }
                         }  // childNode != null`
 
@@ -328,7 +326,7 @@ namespace scrawble
                         if (toPlace->blank()) {
                             if (toPlace->letter() < 'z') {
                                 // increment the letter
-                                toPlace.setLetter((char)(toPlace.letter() + 1));
+                                toPlace->letter((char)(toPlace->letter() + 1));
                                 // Don't move to the next tile yet
                                 continue;
                             }
@@ -336,14 +334,14 @@ namespace scrawble
 
                         // add the tile back to the end of the Rack
                         try {
-                            if (toPlace.blank()) {
-                                rack.add(std::make_shared<BlankTile>());
+                            if (toPlace->blank()) {
+                                rack.push(std::make_shared<BlankTile>());
                             } else {
-                                rack.add(toPlace);
+                                rack.push(toPlace);
                             }
-                        } catch (RackFullException e) {
+                        } catch (const std::out_of_range &e) {
                             placements.clear();
-                            throw std::logic_error("Not expecting RackFullException");
+                            throw e;
                         }
 
                         // move to the next tile
@@ -355,7 +353,7 @@ namespace scrawble
                         // get the next tile from the rack
                         toPlace = rack.pop();
                         if (toPlace->blank()) {
-                            toPlace->setLetter('a');
+                            toPlace->letter('a');
                         }
 
                     }  // while (true)
@@ -366,7 +364,7 @@ namespace scrawble
                     Node::Ptr crossAnchorNode = node->getCrossAnchorNode();
                     if (crossAnchorNode != nullptr && !direction.hasNext(board, x, y)) {
                         // switch directions
-                        Direction inverse = InverseDirection[direction];
+                        Direction inverse = direction.inverse();
                         if (inverse.nextIsInBounds(board, startX, startY)) {
                             std::list<Move> tempPlacements(placements);
                             auto tempAllPlacements = generateAllPlacements(board, startX, startY, inverse.nextX(startX),
@@ -386,19 +384,15 @@ namespace scrawble
                 if (node == nullptr) {
                     return {};
                 }
-                auto childNode = node.getChildNode(tile.getLetter());
+                auto childNode = node->getChildNode(node->getLetter());
                 if (childNode != nullptr) {
                     // Is this the end of the word?
                     if (childNode->isTerminal() && !direction.hasNext(board, x, y)) {
                         // Make sure that letters in front of the start position have been considered
-                        if (direction == Direction.LEFT || direction == Direction.UP ||
-                            ((direction == Direction.RIGHT || direction == Direction.DOWN) &&
+                        if (direction == LEFT || direction == UP ||
+                            ((direction == RIGHT || direction == DOWN) &&
                              !direction.inverse().hasNext(board, startX, startY))) {
-                            if (allPlacements == nullptr) {
-                                allPlacements = new ArrayList<LinkedList<TilePlacement>>();
-                            }
-                            auto tempPlacements = placements;  // copy
-                            allPlacements.insert(allPlacements.begin(), tempPlacements.begin(), tempPlacements.end());
+                            allPlacements.push_back(placements);
                         }
                     }
 
@@ -413,7 +407,7 @@ namespace scrawble
                     } else {
                         // Have to switch directions if we want to keep going...
                         // To switch direction we need a cross anchor node.
-                        auto crossAnchorNode = childNode.getCrossAnchorNode();
+                        auto crossAnchorNode = childNode->getCrossAnchorNode();
                         if (crossAnchorNode != nullptr) {
                             // switch directions
                             Direction inverse = direction.inverse();
@@ -426,8 +420,10 @@ namespace scrawble
                         }
                     }
 
-                    if (tempAllPlacements != nullptr && tempAllPlacements.size() > 0) {
-                        allPlacements.insert(allPlacements.begin(), tempAllPlacements.begin(), tempAllPlacements.end());
+                    if (tempAllPlacements.size() > 0) {
+                        for (auto value : tempAllPlacements) {
+                            allPlacements.push_back(value);
+                        }
                     }
                 }  // childNode != null
             }
@@ -435,11 +431,12 @@ namespace scrawble
             return allPlacements;
         }
 
-        std::list<Move> calculateHighestScorePlacement(const Board &board, const Rack &rack)
+       public:
+        std::list<Move> calculateHighestScorePlacement(const Board &board, Rack rack)
         {
             assert(!rack.empty());
 
-            std::vector<Move> maxPlacement;
+            std::list<Move> maxPlacement;
             int maxScore = 0;
 
             std::list<Move> placements;
@@ -448,7 +445,7 @@ namespace scrawble
                 int x = 0;
                 int y = 0;
                 // go horizontal
-                maxScore = calculateHighestScorePlacement(board, x, y, x, y, rack, placements, trie.getRoot(), RIGHT);
+                maxScore = calculateHighestScorePlacement(board, x, y, x, y, rack, placements, trie_->getRoot(), RIGHT);
                 if (maxScore > 0) {
                     maxPlacement = placements;
                 }
@@ -467,7 +464,7 @@ namespace scrawble
                                 // go horizontal
                                 placements.clear();
                                 score = calculateHighestScorePlacement(board, x, y, x, y, rack, placements,
-                                                                       trie.getRoot(), RIGHT);
+                                                                       trie_->getRoot(), RIGHT);
                                 if (score > maxScore) {
                                     maxScore = score;
                                     maxPlacement = placements;  // copy
@@ -479,7 +476,7 @@ namespace scrawble
                                 // go vertical
                                 placements.clear();
                                 score = calculateHighestScorePlacement(board, x, y, x, y, rack, placements,
-                                                                       trie.getRoot(), DOWN);
+                                                                       trie_->getRoot(), DOWN);
                                 if (score > maxScore) {
                                     maxScore = score;
                                     maxPlacement = placements;  // copy
@@ -494,26 +491,44 @@ namespace scrawble
             return maxPlacement;
         }
 
-        int calculateHighestScorePlacement(const Board &board, int startX, int startY, int x, int y, const Rack &rack,
-                                           const std::list<Move> &placements, const Node::Ptr &node,
-                                           Direction direction)
+       private:
+        /**
+         *
+         */
+        int score(const Board &board, const std::list<Move> &placements) const
+        {
+            int score = 0;
+
+            if (placements.size() == 0) {
+                return 0;
+            }
+
+            for (auto &move : placements) {
+                score += move.score() + board.bonus(move.x(), move.y(), false) + board.bonus(move.x(), move.y(), true);
+            }
+
+            return score;
+        }
+
+        int calculateHighestScorePlacement(const Board &board, int startX, int startY, int x, int y, Rack &rack,
+                                           std::list<Move> &placements, const Node::Ptr &node, Direction direction)
         {
             int maxScore = 0;
             int tempScore = 0;
-            std::vector<Move> maxPlacement;
+            std::list<Move> maxPlacement;
 
             // Is the current location empty?
-            Tile tile = board[x][y];
+            auto tile = board[x][y];
             // check prerequisites
-            if (tile.empty()) {
+            if (tile == nullptr) {
                 int currentNumberOfPlacements = placements.size();
-                int rackCount = rack.tileCount();
+                int rackCount = rack.count();
 
                 if (rackCount > 0) {
                     // take the Tile at the beginning of the Rack
-                    Tile toPlace = rack.take();
-                    if (toPlace.isBlankTile()) {
-                        BlankTile.setLetter(((BlankTile)toPlace), 'a');
+                    auto toPlace = rack.pop();
+                    if (toPlace->blank()) {
+                        toPlace->letter('a');
                     }
 
                     Node::Ptr childNode;
@@ -521,21 +536,21 @@ namespace scrawble
                     // have been processed.
                     int i = 0;
                     while (true) {
-                        childNode = node->getChildNode(toPlace.getLetter());
+                        childNode = node->getChildNode(toPlace->letter());
 
                         if (childNode != nullptr && validateCrossWordExists(board, x, y, toPlace, direction)) {
-                            placements.emplace(x, y, toPlace);
+                            placements.push_back(Move(x, y, toPlace));
 
                             // Is this the end of the word?
-                            if (childNode.isTerminal() && !direction.hasNext(board, x, y)) {
+                            if (childNode->isTerminal() && !direction.hasNext(board, x, y)) {
                                 // Make sure that letters in front of the start position have been considered
-                                if (direction == Direction.LEFT || direction == Direction.UP ||
-                                    ((direction == Direction.RIGHT || direction == Direction.DOWN) &&
+                                if (direction == LEFT || direction == UP ||
+                                    ((direction == RIGHT || direction == DOWN) &&
                                      !direction.inverse().hasNext(board, startX, startY))) {
                                     // score the current placement
-                                    tempScore = board.score(placements, false);
+                                    tempScore = score(board, placements);
                                     if ((tempScore > maxScore) ||
-                                        (tempScore > 0 && tempScore == maxScore && RANDOM.nextBoolean())) {
+                                        (tempScore > 0 && tempScore == maxScore && random_number(0, 1) == 1)) {
                                         maxScore = tempScore;
                                         // copy placements to the max placement place holder
                                         maxPlacement = placements;
@@ -550,7 +565,7 @@ namespace scrawble
                             } else {
                                 // Have to switch directions if we want to keep going...
                                 // To switch direction we need a cross anchor node.
-                                auto crossAnchorNode = childNode.getCrossAnchorNode();
+                                auto crossAnchorNode = childNode->getCrossAnchorNode();
                                 if (crossAnchorNode != nullptr) {
                                     // switch directions
                                     Direction inverse = direction.inverse();
@@ -563,22 +578,22 @@ namespace scrawble
                             }
 
                             if ((tempScore > maxScore) ||
-                                (tempScore > 0 && tempScore == maxScore && RANDOM.nextBoolean())) {
+                                (tempScore > 0 && tempScore == maxScore && random_number(0, 1) == 1)) {
                                 maxScore = tempScore;
                                 maxPlacement = placements;
                             }
 
                             // remove any placements that were added
                             while (placements.size() > currentNumberOfPlacements) {
-                                placements.removeLast();
+                                placements.pop_back();
                             }
                         }  // childNode != null`
 
                         // If this is a blank tile, the move to the tile?
-                        if (toPlace.blank()) {
-                            if (toPlace.getLetter() < 'z') {
+                        if (toPlace->blank()) {
+                            if (toPlace->letter() < 'z') {
                                 // increment the letter
-                                BlankTile.setLetter(((BlankTile)toPlace), (char)(toPlace.getLetter() + 1));
+                                toPlace->letter((char)(toPlace->letter() + 1));
                                 // Don't move to the next tile yet
                                 continue;
                             }
@@ -586,14 +601,14 @@ namespace scrawble
 
                         // add the tile back to the end of the Rack
                         try {
-                            if (toPlace.isBlankTile()) {
-                                rack.add(new BlankTile());
+                            if (toPlace->blank()) {
+                                rack.push(std::make_shared<BlankTile>());
                             } else {
-                                rack.add(toPlace);
+                                rack.push(toPlace);
                             }
-                        } catch (RackFullException e) {
+                        } catch (const std::out_of_range &e) {
                             placements.clear();
-                            throw new RuntimeException("Not expecting RackFullException", e);
+                            throw std::logic_error("Not expecting RackFullException");
                         }
 
                         // move to the next tile
@@ -603,9 +618,9 @@ namespace scrawble
                         }
 
                         // get the next tile from the rack
-                        toPlace = rack.take();
-                        if (toPlace.isBlankTile()) {
-                            BlankTile.setLetter(((BlankTile)toPlace), 'a');
+                        toPlace = rack.pop();
+                        if (toPlace->blank()) {
+                            toPlace->letter('a');
                         }
 
                     }  // while (true)
@@ -613,25 +628,19 @@ namespace scrawble
 
                 // what about #? - at least one tile needs to have have been placed
                 if (currentNumberOfPlacements > 0) {
-                    TrieNode crossAnchorNode = node.getCrossAnchorNode();
-                    if (crossAnchorNode != null && !direction.hasNext(board, x, y)) {
+                    auto crossAnchorNode = node->getCrossAnchorNode();
+                    if (crossAnchorNode != nullptr && !direction.hasNext(board, x, y)) {
                         // switch directions
                         Direction inverse = direction.inverse();
                         if (inverse.nextIsInBounds(board, startX, startY)) {
-                            LinkedList<TilePlacement> tempPlacements = new LinkedList<TilePlacement>(placements);
+                            std::list<Move> tempPlacements(placements);
                             tempScore = calculateHighestScorePlacement(board, startX, startY, inverse.nextX(startX),
                                                                        inverse.nextY(startY), rack, tempPlacements,
                                                                        crossAnchorNode, inverse);
                             if ((tempScore > maxScore) ||
-                                (tempScore > 0 && tempScore == maxScore && RANDOM.nextBoolean())) {
+                                (tempScore > 0 && tempScore == maxScore && random_number(0, 1) == 1)) {
                                 maxScore = tempScore;
-                                // copy tempPlacements to the max placement place holder
-                                if (maxPlacement == null) {
-                                    maxPlacement = new ArrayList<TilePlacement>(tempPlacements);
-                                } else {
-                                    maxPlacement.clear();
-                                    maxPlacement.addAll(tempPlacements);
-                                }
+                                maxPlacement = tempPlacements;
                             }
                         }
                     }
@@ -639,19 +648,19 @@ namespace scrawble
 
             } else {
                 // Does the tile at this location work?
-                if (node == nullptr || tile.empty()) {
+                if (node == nullptr || tile == nullptr) {
                     return 0;
                 }
-                auto childNode = node->getChildNode(tile.getLetter());
+                auto childNode = node->getChildNode(tile->letter());
                 if (childNode != nullptr) {
                     // Is this the end of the word?
-                    if (childNode.isTerminal() && !direction.hasNext(board, x, y)) {
+                    if (childNode->isTerminal() && !direction.hasNext(board, x, y)) {
                         // Make sure that letters in front of the start position have been considered
-                        if (direction == Direction.LEFT || direction == Direction.UP ||
-                            ((direction == Direction.RIGHT || direction == Direction.DOWN) &&
+                        if (direction == LEFT || direction == UP ||
+                            ((direction == RIGHT || direction == DOWN) &&
                              !direction.inverse().hasNext(board, startX, startY))) {
                             // score the current placement
-                            maxScore = board.score(placements, false);
+                            maxScore = score(board, placements);
                             // copy placements to the max placement place holder
                             maxPlacement = placements;
                         }
@@ -667,7 +676,7 @@ namespace scrawble
                     } else {
                         // Have to switch directions if we want to keep going...
                         // To switch direction we need a cross anchor node.
-                        auto crossAnchorNode = childNode.getCrossAnchorNode();
+                        auto crossAnchorNode = childNode->getCrossAnchorNode();
                         if (crossAnchorNode != nullptr) {
                             // switch directions
                             Direction inverse = direction.inverse();
@@ -680,7 +689,8 @@ namespace scrawble
                         }
                     }
 
-                    if ((tempScore > maxScore) || (tempScore > 0 && tempScore == maxScore && RANDOM.nextBoolean())) {
+                    if ((tempScore > maxScore) ||
+                        (tempScore > 0 && tempScore == maxScore && random_number(0, 1) == 1)) {
                         maxScore = tempScore;
                         // copy tempPlacements to the max placement place holder
                         maxPlacement = tempPlacements;
@@ -689,8 +699,7 @@ namespace scrawble
             }
 
             if (!maxPlacement.empty() && maxPlacement.size() > 0) {
-                placements.clear();
-                placements.addAll(maxPlacement);
+                placements = maxPlacement;
             }
 
             return maxScore;
@@ -708,7 +717,7 @@ namespace scrawble
          *
          * @return      <code>true</code> if the perpendicular word is valid, otherwise </code>false</code.
          */
-        bool validateCrossWordExists(const Board &board, int startX, int startY, const Tile &toPlace,
+        bool validateCrossWordExists(const Board &board, int startX, int startY, const Tile::Ptr &toPlace,
                                      Direction direction)
         {
             bool exists = false;
@@ -717,14 +726,14 @@ namespace scrawble
             if (!d.hasNext(board, startX, startY) && !d.inverse().hasNext(board, startX, startY)) {
                 exists = true;
             } else {
-                Tile tile = toPlace;
-                TrieNode node = trie.getRoot();
+                auto tile = toPlace;
+                auto node = trie_->getRoot();
                 int x = startX;
                 int y = startY;
 
-                while (tile != null) {
-                    node = node.getChildNode(tile.getLetter());
-                    if (node == null) {
+                while (tile != nullptr) {
+                    node = node->getChildNode(tile->letter());
+                    if (node == nullptr) {
                         // this word is not valid - there should be a node for every child
                         break;
                     }
@@ -732,7 +741,7 @@ namespace scrawble
                     if (d.hasNext(board, x, y)) {
                         x = d.nextX(x);
                         y = d.nextY(y);
-                        tile = board.get(x, y);
+                        tile = board[x][y];
                     } else {
                         d = d.inverse();
                         if (!d.hasNext(board, startX, startY)) {
@@ -741,26 +750,27 @@ namespace scrawble
 
                         x = d.nextX(startX);
                         y = d.nextY(startY);
-                        tile = board.get(x, y);
+                        tile = board[x][y];
 
-                        if (tile != null) {
+                        if (tile != nullptr) {
                             // must consume a cross anchor node
-                            node = node.getCrossAnchorNode();
-                            if (node == null) {
+                            node = node->getCrossAnchorNode();
+                            if (node == nullptr) {
                                 break;
                             }
                         }
                     }
                 }  // ~while
 
-                if (node != null) {
-                    exists = node.isTerminal();
+                if (node != nullptr) {
+                    exists = node->isTerminal();
                 }
             }
 
             return exists;
         }
 
+       public:
         Trie::Ptr getTrie() const
         {
             return trie_;
@@ -771,4 +781,7 @@ namespace scrawble
             trie_ = trie;
         }
     };
+
 }  // namespace scrawble
+
+#endif
