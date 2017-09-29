@@ -1,5 +1,6 @@
 #include <scrawble/game_logic.h>
 #include <scrawble/rack.h>
+#include <cassert>
 #include <stdexcept>
 
 namespace scrawble
@@ -38,12 +39,21 @@ namespace scrawble
     {
         for (int i = 0; i < size; i++) {
             if (values_[i]) {
-                auto value = values_[i];
-                values_[i] = nullptr;
-                return value;
+                return shift(i);
             }
         }
         throw std::out_of_range("no more tiles in rack");
+    }
+
+    Tile::Ptr Rack::shift(size_t index)
+    {
+        assert(index < size);
+        auto value = values_[index];
+        for (size_t i = index; i < size - 1; i++) {
+            values_[i] = values_[i + 1];
+            values_[i + 1] = nullptr;
+        }
+        return value;
     }
 
     int Rack::count() const
@@ -63,9 +73,7 @@ namespace scrawble
             throw std::out_of_range("invalid index for rack pop");
         }
 
-        Tile::Ptr value = values_[index];
-        values_[index] = nullptr;
-        return value;
+        return shift(index);
     }
 
     Rack& Rack::clear()

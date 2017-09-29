@@ -37,6 +37,7 @@ namespace scrawble
         std::string to_string() const;
 
        private:
+        Tile::Ptr shift(size_t index);
         std::array<Tile::Ptr, size> values_;
     };
 }  // namespace scrawble

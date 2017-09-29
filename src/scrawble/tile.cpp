@@ -20,7 +20,7 @@ namespace scrawble
     {
     }
 
-    Tile::Tile(const Type &letter, int score) : score_(score), letter_(letter)
+    Tile::Tile(const Type &letter, int score) : score_(score), letter_(tolower(letter))
     {
     }
 

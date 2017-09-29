@@ -8,6 +8,7 @@ set(SOURCE_FILES
 	tile.cpp
 	rack.cpp
 	core/gaddag.cpp
+	core/node.cpp
 )
 
 add_library(${PROJECT_NAME} ${SOURCE_FILES})

@@ -2,8 +2,6 @@
 #include <fcntl.h>
 #include <scrawble/core/gaddag.h>
 #include <scrawble/core/node.h>
-#include <scrawble/core/trie.h>
-#include <scrawble/core/trie_factory.h>
 #include <scrawble/game_logic.h>
 #include <util/file_reader.h>
 #include <queue>
@@ -49,21 +47,20 @@ class TestGame : public scrawble::GameLogic
    public:
     void init_dictionary(const std::string &fileName)
     {
-        scrawble::FileBasedTrieFactory factory(TestConfig::ASSET_FOLDER + fileName);
-
-        dictionary_ = std::make_shared<scrawble::Gaddag>(factory);
+        dictionary_ = std::make_shared<scrawble::Gaddag>();
     }
 
     std::set<std::string> hints() const
     {
-        auto moves = dictionary_->calculateHighestScorePlacement(board(), player().rack());
-        std::string buf;
-        for (auto &move : moves) {
-            buf += move.letter();
-        }
-        std::set<std::string> rval;
-        rval.insert(buf);
-        return rval;
+        // auto moves = dictionary_->calculateHighestScorePlacement(board(), player().rack());
+        // std::string buf;
+        // for (auto &move : moves) {
+        //     buf += move.letter();
+        // }
+        // std::set<std::string> rval;
+        // rval.insert(buf);
+        // return rval;
+        return std::set<std::string>();
     }
 
     void set_player_rack(const std::initializer_list<char> &list)
@@ -114,7 +111,7 @@ go_bandit([]() {
         // });
 
         it("can find best word", [&game]() {
-            game->set_player_rack({'C', 'O', 'F', 'Z', 'A', 'D', 'R'});
+            game->set_player_rack({'c', 'o', 'f', 'z', 'a', 'd', 'r'});
 
             auto hints = game->hints();
 
